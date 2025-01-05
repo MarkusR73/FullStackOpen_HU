@@ -27,6 +27,10 @@ const Display = ({text, value}) => {
 // a proper place to define a component
 const Statistics = ({good, neutral, bad, totalFeedback, average, posPerc}) => {
   
+  if (!totalFeedback) {
+    return <p>No feedback given</p>;
+  }
+
   return(
     <div>
       <Display text="good" value={good}/>
