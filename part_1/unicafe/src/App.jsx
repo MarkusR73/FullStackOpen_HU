@@ -31,6 +31,11 @@ const App = () => {
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
 
+  const totalFeedback = good + neutral + bad
+  const average = (good - bad) / totalFeedback
+  // Unusual computations order since "good / totalFeedback * 100" introduced rounding errors
+  const posPerc = good * 100 / totalFeedback
+
   return (
     <div>
       <Header text="give feedback"/>
@@ -41,6 +46,9 @@ const App = () => {
       <Display text="good" value={good}/>
       <Display text="neutral" value={neutral}/>
       <Display text="bad" value={bad}/>
+      <Display text="all" value={totalFeedback} />
+      <Display text="average" value={average}/>
+      <Display text="positive" value={posPerc + " %"}/>
     </div>
   )
 }
