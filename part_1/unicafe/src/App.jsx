@@ -1,26 +1,40 @@
 import { useState } from 'react'
 
-const Header = (props) => {
-  console.log(props)
+const Header = ({text}) => {
   return( 
   <h1>
-    {props.text}
+    {text}
   </h1> 
   )
 }
 
-const Button = (props) => {
+const Button = ({onClick, text}) => {
   return(
-    <button onClick={props.onClick}>
-      {props.text}
+    <button onClick={onClick}>
+      {text}
     </button>
   )
 }
 
-const Display = (props) => {
+const Display = ({text, value}) => {
   return(
     <div>
-      {props.text} {props.value}
+      {text} {value}
+    </div>
+  )
+}
+
+// a proper place to define a component
+const Statistics = ({good, neutral, bad, totalFeedback, average, posPerc}) => {
+  
+  return(
+    <div>
+      <Display text="good" value={good}/>
+      <Display text="neutral" value={neutral}/>
+      <Display text="bad" value={bad}/>
+      <Display text="all" value={totalFeedback} />
+      <Display text="average" value={average}/>
+      <Display text="positive" value={posPerc + " %"}/>
     </div>
   )
 }
@@ -32,9 +46,6 @@ const App = () => {
   const [bad, setBad] = useState(0)
 
   const totalFeedback = good + neutral + bad
-  const average = (good - bad) / totalFeedback
-  // Unusual computations order since "good / totalFeedback * 100" introduced rounding errors
-  const posPerc = good * 100 / totalFeedback
 
   return (
     <div>
@@ -43,12 +54,14 @@ const App = () => {
       <Button onClick={() => setNeutral(neutral + 1)} text="neutral"/>
       <Button onClick={() => setBad(bad + 1)} text="bad"/>
       <Header text="statistics"/>
-      <Display text="good" value={good}/>
-      <Display text="neutral" value={neutral}/>
-      <Display text="bad" value={bad}/>
-      <Display text="all" value={totalFeedback} />
-      <Display text="average" value={average}/>
-      <Display text="positive" value={posPerc + " %"}/>
+      <Statistics 
+        good={good} 
+        neutral={neutral} 
+        bad={bad} 
+        totalFeedback={totalFeedback} 
+        average={(good - bad) / totalFeedback} 
+        posPerc={good * 100 / totalFeedback} 
+      />
     </div>
   )
 }
