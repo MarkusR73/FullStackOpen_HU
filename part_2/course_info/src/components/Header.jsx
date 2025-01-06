@@ -1,8 +1,15 @@
-const Header = ({ course }) => {
-    console.log(course)
+const Header_1 = ({text}) => {
+    console.log(text)
     return(
-        <h1>{course}</h1>
+        <h1>{text}</h1>
     )
 }
 
-export default Header
+const Header_2 = ({ course }) => {
+    console.log(course)
+    return(
+        <h2>{course}</h2>
+    )
+}
+
+export {Header_1, Header_2}

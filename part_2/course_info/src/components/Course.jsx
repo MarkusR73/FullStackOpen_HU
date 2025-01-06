@@ -1,12 +1,11 @@
-import Header from "./Header"
-import Content from "./Content"
-import Total from "./Total"
+import { Header_2 } from "./Header"
+import { Content, Total } from "./Subcomponents"
 
 const Course = ({course}) => {
     console.log(course)
     return(
         <div>
-            <Header course={course.name}/>
+            <Header_2 course={course.name}/>
             <Content parts={course.parts}/>
             <Total parts={course.parts} />
         </div>
