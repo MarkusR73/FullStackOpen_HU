@@ -28,11 +28,30 @@ const App = () => {
     const nameExists = persons.some((person) => person.name === newName.trim())
     const numberExists = persons.some((person) => person.number === newNumber.trim())
 
-    if (nameExists) {
-      alert(`${newName} is already added to the phonebook`)
-    }
-    else if (numberExists) {
+    
+    if (numberExists) {
       alert(`${newNumber} is already added to the phonebook`)
+      return // Cancel further execution
+    }
+    else if (nameExists && !numberExists) {
+      if (window.confirm(`${newName.trim()} is already added to the phonebook, replace the old number with a new one?`)){
+        const personObject = {
+          name: newName.trim(),
+          number: newNumber.trim(),
+        }
+        const person = persons.find(p => p.name === newName.trim())
+        personService
+          .update(person.id, personObject)
+          .then(returnedPerson => {
+            setPersons(persons.map(p => p.id === person.id ? returnedPerson : p))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
+      else {
+        return // Cancel further execution
+      }
+
     }
     else {
       const personObject = {
