@@ -3,6 +3,7 @@ import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/Forms'
 import axios from 'axios'
+import personService from './services/perser'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -10,19 +11,17 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
-  const hook = () => {
+  useEffect (() => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
       .catch(error => {
-        console.error('Error fetching data:', error); // Log any errors.
+        console.error('Error fetching data:', error) // Log any errors.
       })
-  }
-  useEffect(hook, [])
+  }, [])
   console.log('render', persons.length, 'persons')
 
   const addPerson = (event) => {
@@ -40,11 +39,14 @@ const App = () => {
       const personObject = {
         name: newName.trim(),
         number: newNumber.trim(),
-        id: persons.length
       }
-      setPersons(persons.concat(personObject))
-      setNewName('')
-      setNewNumber('')
+      personService
+        .create(personObject)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
 
