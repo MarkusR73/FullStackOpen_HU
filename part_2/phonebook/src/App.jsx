@@ -49,6 +49,20 @@ const App = () => {
     }
   }
 
+  const removePerson = (id) => {
+    const person = persons.find(p => p.id === id)
+    if (window.confirm(`Delete ${person.name}?`)){
+      personService
+        .remove(id)
+        .then(() => {
+          setPersons(persons.filter(p => p.id !== person.id))
+        })
+        .catch(error => {
+          alert(`Failed to delete '${person.name}' from the server`);
+        })
+    }
+  }
+
   const updateName = (event) => {
     console.log(event.target.value)
     setNewName(event.target.value)
@@ -81,7 +95,7 @@ const App = () => {
         updateNumber={updateNumber}
       />
       <h3>Numbers</h3>
-      <Persons persons={personsToShow}/>
+      <Persons persons={personsToShow} removePerson={removePerson}/>
     </div>
   )
 }
