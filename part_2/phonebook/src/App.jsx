@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/Forms'
-import axios from 'axios'
 import personService from './services/perser'
 
 const App = () => {
@@ -19,7 +18,7 @@ const App = () => {
         setPersons(initialPersons)
       })
       .catch(error => {
-        console.error('Error fetching data:', error) // Log any errors.
+        console.error('Error fetching data:', error) // Log any errors
       })
   }, [])
   console.log('render', persons.length, 'persons')
