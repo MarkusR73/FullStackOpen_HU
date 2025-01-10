@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
+import {useState, useEffect} from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/Forms'
 import personService from './services/perser'
-import Added from './components/Notifications'
+import {Added, Error} from './components/Notifications'
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -11,6 +11,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
   const [addedMessage, setAddedMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect (() => {
     console.log('effect')
@@ -46,10 +47,15 @@ const App = () => {
           .update(person.id, personObject)
           .then(returnedPerson => {
             setPersons(persons.map(p => p.id === person.id ? returnedPerson : p))
-            setAddedMessage(`Updated ${newName}`)
+            setAddedMessage(`Updated ${newName.trim()}`)
             setTimeout(() => {setAddedMessage(null)}, 3000)
             setNewName('')
             setNewNumber('')
+          })
+          .catch(error => {
+            setErrorMessage(`Information of '${newName.trim()}' has already been removed from server`)
+            setTimeout(() => {setErrorMessage(null)}, 5000)
+            setPersons(persons.filter(p => p.name !== newName.trim()))
           })
       }
       else {
@@ -111,6 +117,7 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <Added message={addedMessage}/>
+      <Error message={errorMessage}/>
       <Filter value={filter} onChange={updateFilter}/>
       <h3>add a new</h3>
       <PersonForm 
