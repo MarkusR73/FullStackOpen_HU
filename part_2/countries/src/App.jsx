@@ -20,8 +20,8 @@ const App = () => {
           setCountries(response.data)
         })
         .catch(error => {
-          console.error('Error fetching countries:', error);
-          setFilterErrorMessage('Failed to load country data');
+          console.error('Error fetching countries:', error)
+          setFilterErrorMessage('Failed to load country data')
         })
   }, [])
 
@@ -44,7 +44,7 @@ const App = () => {
       }
       // Fetch weather data if exactly one country is found
       if (filtered.length === 1) {
-        const country = filtered[0];
+        const country = filtered[0]
         const [lat, lon] = country.capitalInfo?.latlng 
         const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`
         axios
@@ -57,7 +57,7 @@ const App = () => {
             setWeatherData(null)
           })
       } else {
-          setWeatherData(null); // Clear weather data if there are multiple matches
+          setWeatherData(null) // Clear weather data if there are multiple matches
       }
     }
   }, [nameFilter, countries])
