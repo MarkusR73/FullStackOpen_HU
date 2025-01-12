@@ -8,7 +8,10 @@ const App = () => {
   const [matches, setMatches] = useState(null)
   const [countries, setCountries] = useState(null)
   const [selectedCountries, setSelectedCountries] = useState({})
+  const [lastSelectedCountry, setLastSelectedCountry] = useState(null)
+  const [weatherDataByCountry, setWeatherDataByCountry] = useState({})
   const [filterErrorMessage, setFilterErrorMessage] = useState(null)
+  const api_key = import.meta.env.VITE_SOME_KEY
 
   useEffect(() => {
     console.log('Executing API call...')
@@ -40,8 +43,37 @@ const App = () => {
         setMatches(filtered)
         setFilterErrorMessage(null)
       }
+      if (filtered.length === 1) {
+        setLastSelectedCountry(filtered[0]);
+      }
+    }
+  }, [nameFilter, countries])
+
+// Effect to handle weather API calls for the lastSelectedCountry
+useEffect(() => {
+  console.log("Entered weather API effect...")
+  if (lastSelectedCountry && lastSelectedCountry.capitalInfo?.latlng && !weatherDataByCountry[lastSelectedCountry.cca3]) {
+    const [lat, lon] = lastSelectedCountry.capitalInfo.latlng;
+    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`
+
+    axios
+      .get(weatherApiUrl)
+      .then((response) => {
+        console.log(`Weather data for ${lastSelectedCountry.name.common}`)
+        setWeatherDataByCountry(prevState => ({
+          ...prevState,
+          [lastSelectedCountry.cca3]: response.data
+        }))
+      })
+      .catch((error) => {
+        console.log(`Failed to fetch weather data for ${lastSelectedCountry.name.common}:`, error)
+        setWeatherDataByCountry(prevState => ({
+          ...prevState,
+          [lastSelectedCountry.cca3]: null
+        }))
+      })
   }
-  }, [nameFilter], [countries])
+}, [lastSelectedCountry])  
 
   const updateNameFilter = (event) => {
     setNameFilter(event.target.value)
@@ -52,6 +84,10 @@ const App = () => {
       ...prevState,
       [country.cca3]: !prevState[country.cca3],
     }))
+     // Set lastSelectedCountry to trigger weather API call only when country info is shown
+     if (!selectedCountries[country.cca3]) {
+      setLastSelectedCountry(country)
+    }
   }
 
   return (
@@ -61,7 +97,8 @@ const App = () => {
       <Matches 
         matches={matches} 
         selectedCountries={selectedCountries} 
-        toggleCountryView={toggleCountryView} 
+        toggleCountryView={toggleCountryView}
+        weatherDataByCountry={weatherDataByCountry} 
       />
     </div>
   )

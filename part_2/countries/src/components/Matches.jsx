@@ -1,6 +1,4 @@
-import {useState} from "react"
-
-const Matches = ({matches, selectedCountries, toggleCountryView}) => {
+const Matches = ({matches, selectedCountries, toggleCountryView, weatherDataByCountry}) => {
 
     if (!matches) {
         return null
@@ -16,6 +14,7 @@ const Matches = ({matches, selectedCountries, toggleCountryView}) => {
                 area={matches[0].area}
                 languages={matches[0].languages}
                 flag={matches[0].flags.png}
+                weatherData={weatherDataByCountry[matches[0].cca3]}
                 onHide={null}
             />
         )
@@ -31,6 +30,7 @@ const Matches = ({matches, selectedCountries, toggleCountryView}) => {
                             area={country.area}
                             languages={country.languages}
                             flag={country.flags.png}
+                            weatherData={weatherDataByCountry[country.cca3]}
                             onHide={() => toggleCountryView(country)}
                         />
                     ) : (
@@ -53,7 +53,33 @@ const Country = ({countryInfo, onShow}) => {
     )
 }
 
-const CountryInfo = ({name, capital, area, languages, flag, onHide}) => {
+const WeatherData = ({data}) => {
+    if (!data) {
+        return
+    }
+    const tempCelsius = (data.main.temp - 273.15).toFixed(2)
+    const weatherIconCode = data.weather[0].icon
+    const weatherIconUrl = `https://openweathermap.org/img/wn/${weatherIconCode}.png`
+    return (
+        <div>
+            <p> temperature {tempCelsius} Celcius </p>
+            <img 
+                src={weatherIconUrl} 
+                alt={data.weather[0].description} 
+                style={{
+                    width: "50px", 
+                    height: "50px", 
+                    verticalAlign: "middle",  // Remove extra space
+                    display: "inline-block",  // Ensure it doesn't have extra inline spacing
+                    margin: "0"  // Remove any margins
+                }} 
+            />
+            <p> wind {data.wind.speed} m/s </p>
+        </div>
+    )
+}
+
+const CountryInfo = ({name, capital, area, languages, flag, weatherData, onHide}) => {
     return (
         <div>
             <h2>{name} {onHide && <button onClick={onHide}>hide</button>}</h2>
@@ -63,11 +89,13 @@ const CountryInfo = ({name, capital, area, languages, flag, onHide}) => {
             </p>
             <h3>languages:</h3>
             <ul>
-                {Object.values(languages).map((lang) => (
-                    <li>{lang}</li>
+                {Object.values(languages).map((lang, index) => (
+                    <li key={index}>{lang}</li>
                 ))}
             </ul>
             <img src={flag} style={{width: "150px"}} />
+            <h3>Weather in {capital}</h3>
+            <WeatherData data={weatherData}/>
         </div>
     )
 }
