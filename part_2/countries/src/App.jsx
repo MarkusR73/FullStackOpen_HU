@@ -8,8 +8,7 @@ const App = () => {
   const [matches, setMatches] = useState(null)
   const [countries, setCountries] = useState(null)
   const [selectedCountries, setSelectedCountries] = useState({})
-  const [lastSelectedCountry, setLastSelectedCountry] = useState(null)
-  const [weatherDataByCountry, setWeatherDataByCountry] = useState({})
+  const [weatherData, setWeatherData] = useState({})
   const [filterErrorMessage, setFilterErrorMessage] = useState(null)
   const api_key = import.meta.env.VITE_SOME_KEY
 
@@ -43,37 +42,25 @@ const App = () => {
         setMatches(filtered)
         setFilterErrorMessage(null)
       }
+      // Fetch weather data if exactly one country is found
       if (filtered.length === 1) {
-        setLastSelectedCountry(filtered[0]);
+        const country = filtered[0];
+        const [lat, lon] = country.capitalInfo?.latlng 
+        const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`
+        axios
+          .get(weatherApiUrl)
+          .then((response) => {
+            setWeatherData(response.data)
+            })
+          .catch((error) => {
+            console.log(`Failed to fetch weather data for ${country.name.common}:`, error)
+            setWeatherData(null)
+          })
+      } else {
+          setWeatherData(null); // Clear weather data if there are multiple matches
       }
     }
   }, [nameFilter, countries])
-
-// Effect to handle weather API calls for the lastSelectedCountry
-useEffect(() => {
-  console.log("Entered weather API effect...")
-  if (lastSelectedCountry && lastSelectedCountry.capitalInfo?.latlng && !weatherDataByCountry[lastSelectedCountry.cca3]) {
-    const [lat, lon] = lastSelectedCountry.capitalInfo.latlng;
-    const weatherApiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${api_key}`
-
-    axios
-      .get(weatherApiUrl)
-      .then((response) => {
-        console.log(`Weather data for ${lastSelectedCountry.name.common}`)
-        setWeatherDataByCountry(prevState => ({
-          ...prevState,
-          [lastSelectedCountry.cca3]: response.data
-        }))
-      })
-      .catch((error) => {
-        console.log(`Failed to fetch weather data for ${lastSelectedCountry.name.common}:`, error)
-        setWeatherDataByCountry(prevState => ({
-          ...prevState,
-          [lastSelectedCountry.cca3]: null
-        }))
-      })
-  }
-}, [lastSelectedCountry])  
 
   const updateNameFilter = (event) => {
     setNameFilter(event.target.value)
@@ -84,10 +71,6 @@ useEffect(() => {
       ...prevState,
       [country.cca3]: !prevState[country.cca3],
     }))
-     // Set lastSelectedCountry to trigger weather API call only when country info is shown
-     if (!selectedCountries[country.cca3]) {
-      setLastSelectedCountry(country)
-    }
   }
 
   return (
@@ -98,7 +81,7 @@ useEffect(() => {
         matches={matches} 
         selectedCountries={selectedCountries} 
         toggleCountryView={toggleCountryView}
-        weatherDataByCountry={weatherDataByCountry} 
+        weatherData={weatherData} 
       />
     </div>
   )

@@ -1,4 +1,4 @@
-const Matches = ({matches, selectedCountries, toggleCountryView, weatherDataByCountry}) => {
+const Matches = ({matches, selectedCountries, toggleCountryView, weatherData}) => {
 
     if (!matches) {
         return null
@@ -14,7 +14,7 @@ const Matches = ({matches, selectedCountries, toggleCountryView, weatherDataByCo
                 area={matches[0].area}
                 languages={matches[0].languages}
                 flag={matches[0].flags.png}
-                weatherData={weatherDataByCountry[matches[0].cca3]}
+                weatherData={weatherData}
                 onHide={null}
             />
         )
@@ -30,7 +30,7 @@ const Matches = ({matches, selectedCountries, toggleCountryView, weatherDataByCo
                             area={country.area}
                             languages={country.languages}
                             flag={country.flags.png}
-                            weatherData={weatherDataByCountry[country.cca3]}
+                            weatherData={weatherData}
                             onHide={() => toggleCountryView(country)}
                         />
                     ) : (
@@ -94,8 +94,12 @@ const CountryInfo = ({name, capital, area, languages, flag, weatherData, onHide}
                 ))}
             </ul>
             <img src={flag} style={{width: "150px"}} />
-            <h3>Weather in {capital}</h3>
-            <WeatherData data={weatherData}/>
+            {weatherData && (
+                <div>
+                    <h3>Weather in {capital}</h3>
+                    <WeatherData data={weatherData}/>
+                </div>
+            )}
         </div>
     )
 }
