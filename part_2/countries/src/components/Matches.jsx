@@ -1,11 +1,14 @@
-const Matches = ({matches}) => {
+import {useState} from "react"
+
+const Matches = ({matches, selectedCountries, toggleCountryView}) => {
+
     if (!matches) {
         return null
     }
-    else if (matches.length === 0) {
+    if (matches.length === 0) {
         return <p>No matches found.</p>
     }
-    else if (matches.length === 1) {
+    if (matches.length === 1) {
         return (
             <CountryInfo 
                 name={matches[0].name.common}
@@ -13,28 +16,47 @@ const Matches = ({matches}) => {
                 area={matches[0].area}
                 languages={matches[0].languages}
                 flag={matches[0].flags.png}
+                onHide={null}
             />
         )
     }
-    else {
-        return (
-            <p>{matches.map(country => <Country key={country.cca3} name={country.name.common}/>)}</p>
-        )
-    }
+    return (
+        <div>
+            {matches.map((country) => (
+                <div key={country.cca3}>
+                    {selectedCountries[country.cca3] ? (
+                        <CountryInfo
+                            name={country.name.common}
+                            capital={country.capital}
+                            area={country.area}
+                            languages={country.languages}
+                            flag={country.flags.png}
+                            onHide={() => toggleCountryView(country)}
+                        />
+                    ) : (
+                        <Country
+                            countryInfo={country}
+                            onShow={() => toggleCountryView(country)}
+                        />
+                    )}
+                </div>
+            ))}
+        </div>
+    )
 }
 
-const Country = ({name}) => {
+const Country = ({countryInfo, onShow}) => {
     return (
         <p>
-            {name}
+            {countryInfo.name.common} <button onClick={onShow}>show</button>
         </p>
     )
 }
 
-const CountryInfo = ({name, capital, area, languages, flag}) => {
+const CountryInfo = ({name, capital, area, languages, flag, onHide}) => {
     return (
         <div>
-            <h2>{name}</h2>
+            <h2>{name} {onHide && <button onClick={onHide}>hide</button>}</h2>
             <p>
                 capital {capital}<br/>
                 area {area}

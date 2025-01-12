@@ -7,6 +7,7 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState('')
   const [matches, setMatches] = useState(null)
   const [countries, setCountries] = useState(null)
+  const [selectedCountries, setSelectedCountries] = useState({})
   const [filterErrorMessage, setFilterErrorMessage] = useState(null)
 
   useEffect(() => {
@@ -46,11 +47,22 @@ const App = () => {
     setNameFilter(event.target.value)
   }
 
+  const toggleCountryView = (country) => {
+    setSelectedCountries((prevState) => ({
+      ...prevState,
+      [country.cca3]: !prevState[country.cca3],
+    }))
+  }
+
   return (
     <div>
       find countries <input value={nameFilter} onChange={updateNameFilter} />
       <FilterError message={filterErrorMessage}/>
-      <Matches matches={matches}/>
+      <Matches 
+        matches={matches} 
+        selectedCountries={selectedCountries} 
+        toggleCountryView={toggleCountryView} 
+      />
     </div>
   )
 }
