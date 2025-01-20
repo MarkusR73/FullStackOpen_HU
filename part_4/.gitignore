@@ -1,0 +1,12 @@
+log.html 
+report.html 
+output.xml 
+geckodriver-*.log 
+*.png
+__pycache__/
+*.pyc
+*.txt
+.idea
+test/
+node_modules/
+.env
