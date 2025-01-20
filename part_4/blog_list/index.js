@@ -1,4 +1,5 @@
 const config = require('./utils/config') // import environmental variables
+const logger = require('./utils/logger') // import loggers
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -17,10 +18,10 @@ const Blog = mongoose.model('Blog', blogSchema)
 
 mongoose.connect(config.MONGODB_URI)
   .then(() => {
-	  console.log('Connected to MongoDB')
+	  logger.info('Connected to MongoDB')
   })
   .catch((error) => {
-	  console.error('Error connecting to MongoDB:', error.message)
+	  logger.error('Error connecting to MongoDB:', error.message)
   })
 
 app.use(cors())
@@ -47,5 +48,5 @@ app.post('/api/blogs', (request, response) => {
 })
 
 app.listen(config.PORT, () => {
-  console.log(`Server running on port ${config.PORT}`)
+  logger.info(`Server running on port ${config.PORT}`)
 })
