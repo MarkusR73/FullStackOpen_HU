@@ -4,6 +4,7 @@ const dummy = require('../utils/list_helper').dummy
 const totalLikes = require('../utils/list_helper').totalLikes
 const favoriteBlog = require('../utils/list_helper').favoriteBlog
 const mostBlogs = require('../utils/list_helper').mostBlogs
+const mostLikes = require('../utils/list_helper').mostLikes
 const { listWithOneBlog, listWithMultipleBlogs } = require('./test_data')
 
 test('dummy returns one', () => {
@@ -43,7 +44,7 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(result, expected)
   })
 
-  test('of a biggert list returns one with the most likes', () => {
+  test('of a biggert list returns one of the blogs with the most likes', () => {
     const result = favoriteBlog(listWithMultipleBlogs)
     const expected = {
       title: 'Canonical string reduction',
@@ -70,11 +71,37 @@ describe('Most blogs', () => {
     assert.deepStrictEqual(result, expected)
   })
 
-  test('of a biggert list returns an author with the most blogs', () => {
+  test('of a biggert list returns one of the authors with the most blogs', () => {
     const result = mostBlogs(listWithMultipleBlogs)
     const expected = {
       author: 'Robert C. Martin',
       blogs: 3
+    }
+    assert.deepStrictEqual(result, expected)
+  })
+})
+
+describe('Most Likes', () => {
+  test('of empty list is null', () => {
+    const result = mostLikes([])
+    const expected = null
+    assert.deepStrictEqual(result, expected)
+  })
+
+  test('when list has only one blog returns the author of that blog', () => {
+    const result = mostLikes(listWithOneBlog)
+    const expected = {
+      author: 'Michael Chan',
+      likes: 7,
+    }
+    assert.deepStrictEqual(result, expected)
+  })
+
+  test('of a biggert list returns one of the authors with the most likes', () => {
+    const result = mostLikes(listWithMultipleBlogs)
+    const expected = {
+      author: 'Edsger W. Dijkstra',
+      likes: 17
     }
     assert.deepStrictEqual(result, expected)
   })
