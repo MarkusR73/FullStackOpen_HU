@@ -6,7 +6,10 @@
     "typescript",
     "typescriptreact"
   ],
+	"eslint.alwaysShowStatus": true,
   "eslint.workingDirectories": [
     "./"
-  ]
+  ],
+	"eslint.nodePath": "./node_modules",
+	"eslint.configFile": "./eslint.config.mjs"
 }
