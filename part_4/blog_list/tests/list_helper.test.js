@@ -28,9 +28,9 @@ describe('Api blogs:', () => {
     const response = await api
       .get('/api/blogs')
       .expect(200)
-      // Ensure correct format
+      // Verify correct format
       .expect('Content-Type', /application\/json/)
-    // Ensure the correct amount of blogs are returned
+    // Verify the correct amount of blogs are returned
     assert.strictEqual(response.body.length, listWithMultipleBlogs.length)
   })
 
@@ -38,11 +38,40 @@ describe('Api blogs:', () => {
     const response = await api.get('/api/blogs')
 
     response.body.forEach((blog) => {
-      // Ensure the id property exists and _id does not
+      // Verify the id property exists and _id does not
       assert.ok(blog.id)
       assert.strictEqual(blog._id, undefined)
     })
   })
+
+  test('A valid blog can be added to database', async () => {
+    const newBlog = {
+      title: 'This is a valid blog',
+      author: 'Unknown',
+      url: 'validBlogs.com',
+      likes: 0
+    }
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const finalResponse = await api.get('/api/blogs')
+    const finalBlogs = finalResponse.body
+
+    // Verify the total number of blogs has increased by one
+    assert.strictEqual(finalBlogs.length, listWithMultipleBlogs.length + 1)
+    // Verify that the content of the blog post is saved correctly to the database
+    const blogAdded = finalBlogs.find(blog =>
+      blog.title === newBlog.title &&
+			blog.author === newBlog.author &&
+			blog.url === newBlog.url &&
+			blog.likes === newBlog.likes
+    )
+    assert(blogAdded)
+  })
+
 })
 
 test('dummy returns one', () => {
