@@ -72,6 +72,22 @@ describe('Api blogs:', () => {
     assert(blogAdded)
   })
 
+  test('Likes default to 0 if missing from the request', async () => {
+    const newBlog = {
+      title: 'Blog without likes',
+      author: 'Mr Notliked',
+      url: 'noLikesBlog.com'
+    }
+
+    const response = await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    // Verify that the likes property is set to 0 by default
+    assert.strictEqual(response.body.likes, 0)
+  })
 })
 
 test('dummy returns one', () => {
