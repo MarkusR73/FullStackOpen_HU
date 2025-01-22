@@ -23,7 +23,7 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
-describe('Get all blogs', () => {
+describe('Api blogs:', () => {
   test('All blogs are returned in JSON format', async () => {
     const response = await api
       .get('/api/blogs')
@@ -32,6 +32,16 @@ describe('Get all blogs', () => {
       .expect('Content-Type', /application\/json/)
     // Ensure the correct amount of blogs are returned
     assert.strictEqual(response.body.length, listWithMultipleBlogs.length)
+  })
+
+  test('Blogs have an id property instead of _id', async () => {
+    const response = await api.get('/api/blogs')
+
+    response.body.forEach((blog) => {
+      // Ensure the id property exists and _id does not
+      assert.ok(blog.id)
+      assert.strictEqual(blog._id, undefined)
+    })
   })
 })
 
