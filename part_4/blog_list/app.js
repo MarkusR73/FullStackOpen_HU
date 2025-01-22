@@ -26,4 +26,6 @@ app.use(middleware.requestLogger)
 // Routes configuration.
 app.use('/api/blogs', blogsRouter)
 
+app.use(middleware.errorHandler)
+
 module.exports = app

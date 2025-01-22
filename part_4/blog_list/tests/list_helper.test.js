@@ -124,6 +124,22 @@ describe('Api blogs:', () => {
     // Verify the total number of blogs has not increased
     assert.strictEqual(finalBlogs.length, listWithMultipleBlogs.length)
   })
+
+  describe('Deletion of a blog', () => {
+    test('Succeeds with status code 204 if id valid', async () => {
+      const blogs = await api.get('/api/blogs')
+			const blogToDelete = blogs.body[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+			const blogsAtEnd = await api.get('/api/blogs')
+
+			// Verify the total number of blogs has decreased by one
+			assert.strictEqual(listWithMultipleBlogs.length - 1, blogsAtEnd.body.length)
+    })
+  })
 })
 
 test('dummy returns one', () => {

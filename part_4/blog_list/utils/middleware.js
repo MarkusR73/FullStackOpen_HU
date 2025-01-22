@@ -1,4 +1,4 @@
-const logger = require('./logger') // import loggers
+const logger = require('./logger')
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -8,4 +8,13 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-module.exports = { requestLogger }
+const errorHandler = (error, request, response, next) => {
+  logger.error(error.message)
+
+  if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
+  }
+  next(error)
+}
+
+module.exports = { requestLogger, errorHandler }

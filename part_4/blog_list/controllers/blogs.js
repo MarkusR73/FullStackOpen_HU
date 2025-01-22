@@ -15,14 +15,15 @@ blogsRouter.get('/', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
   const blog = new Blog(request.body)
 
-  if (!blog.title || !blog.url) {
-    response.status(400).end
-  }
-
   const savedBlog = await blog.save()
   response.status(201).json(savedBlog)
   // Using the express-async-errors library ensures that any exceptions
   // are automatically passed to the error-handling middleware.
+})
+
+blogsRouter.delete('/:id', async (request, response) => {
+  await Blog.findByIdAndDelete(request.params.id)
+  response.status(204).end()
 })
 
 module.exports = blogsRouter
