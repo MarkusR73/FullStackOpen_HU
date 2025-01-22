@@ -14,6 +14,11 @@ blogsRouter.get('/', async (request, response) => {
 // Route to add a new blog
 blogsRouter.post('/', async (request, response) => {
   const blog = new Blog(request.body)
+
+  if (!blog.title || !blog.url) {
+    response.status(400).end
+  }
+
   const savedBlog = await blog.save()
   response.status(201).json(savedBlog)
   // Using the express-async-errors library ensures that any exceptions

@@ -88,6 +88,42 @@ describe('Api blogs:', () => {
     // Verify that the likes property is set to 0 by default
     assert.strictEqual(response.body.likes, 0)
   })
+
+  test('Blog without title is not added', async () => {
+    const newBlog = {
+      author: 'Todd  Titleton',
+      url: 'noTitle.com',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+
+    const finalResponse = await api.get('/api/blogs')
+    const finalBlogs = finalResponse.body
+
+    // Verify the total number of blogs has not increased
+    assert.strictEqual(finalBlogs.length, listWithMultipleBlogs.length)
+  })
+
+  test('Blog without url is not added', async () => {
+    const newBlog = {
+      author: 'Mrs Nourl',
+      title: 'Blog with no url',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+
+    const finalResponse = await api.get('/api/blogs')
+    const finalBlogs = finalResponse.body
+
+    // Verify the total number of blogs has not increased
+    assert.strictEqual(finalBlogs.length, listWithMultipleBlogs.length)
+  })
 })
 
 test('dummy returns one', () => {
