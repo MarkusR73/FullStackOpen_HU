@@ -1,11 +1,39 @@
-const { test, describe } = require('node:test')
+const { test, describe, after, beforeEach } = require('node:test')
 const assert = require('node:assert')
+const mongoose = require('mongoose')
+const supertest = require('supertest')
 const dummy = require('../utils/list_helper').dummy
 const totalLikes = require('../utils/list_helper').totalLikes
 const favoriteBlog = require('../utils/list_helper').favoriteBlog
 const mostBlogs = require('../utils/list_helper').mostBlogs
 const mostLikes = require('../utils/list_helper').mostLikes
 const { listWithOneBlog, listWithMultipleBlogs } = require('./test_data')
+
+const app = require('../app')
+const api = supertest(app)
+
+const Blog = require('../models/blog')
+
+beforeEach(async () => {
+  await Blog.deleteMany({})
+
+  const blogObjects = listWithMultipleBlogs
+    .map(blog => new Blog(blog))
+  const promiseArray = blogObjects.map(blog => blog.save())
+  await Promise.all(promiseArray)
+})
+
+describe('Get all blogs', () => {
+  test('All blogs are returned in JSON format', async () => {
+    const response = await api
+      .get('/api/blogs')
+      .expect(200)
+      // Ensure correct format
+      .expect('Content-Type', /application\/json/)
+    // Ensure the correct amount of blogs are returned
+    assert.strictEqual(response.body.length, listWithMultipleBlogs.length)
+  })
+})
 
 test('dummy returns one', () => {
   const blogs = []
@@ -105,4 +133,8 @@ describe('Most Likes', () => {
     }
     assert.deepStrictEqual(result, expected)
   })
+})
+
+after(async () => {
+  await mongoose.connection.close()
 })
