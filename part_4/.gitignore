@@ -10,3 +10,4 @@ __pycache__/
 test/
 node_modules/
 .env
+.vscode/
