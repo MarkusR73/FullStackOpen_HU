@@ -25,9 +25,8 @@ app.use(cors())
 app.use(express.json())
 app.use(middleware.requestLogger)
 
-app.use(middleware.tokenExtractor)
 // Routes configuration.
-app.use('/api/blogs', blogsRouter)
+app.use('/api/blogs', blogsRouter) // tokenExtractor & userExtractor utilization configured separately in blogs.js
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
