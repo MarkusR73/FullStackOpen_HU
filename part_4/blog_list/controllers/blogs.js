@@ -2,6 +2,7 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 // Route to fetch all blogs
 blogsRouter.get('/', async (request, response) => {
@@ -14,26 +15,36 @@ blogsRouter.get('/', async (request, response) => {
   // are automatically passed to the error-handling middleware.
 })
 
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
+
 // Route to add a new blog
 blogsRouter.post('/', async (request, response) => {
   const body = request.body
 
-	const users = await User.find({})
-
-	const randomUser = users[Math.floor(Math.random() * users.length)]
+	const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  const user = await User.findById(decodedToken.id)
 
 	const blog = new Blog({
 		url: body.url,
   	title: body.title,
   	author: body.author,
-  	user: randomUser.id,
+  	user: user.id,
   	likes: body.likes
 	})
 
   const savedBlog = await blog.save()
 
-	randomUser.blogs = randomUser.blogs.concat(savedBlog._id)
-	await randomUser.save()
+	user.blogs = user.blogs.concat(savedBlog._id)
+	await user.save()
 
   response.status(201).json(savedBlog)
   // Using the express-async-errors library ensures that any exceptions
