@@ -9,6 +9,9 @@ const api = supertest(app)
 
 const Blog = require('../models/blog')
 
+// Execute all: npm test -- --test-concurrency=1
+// just this file: npm test ./tests/blog_api.test.js
+
 beforeEach(async () => {
   await Blog.deleteMany({})
 
