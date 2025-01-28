@@ -5,6 +5,7 @@ const logger = require('./utils/logger')
 const middleware = require('./utils/middleware')
 require('express-async-errors') // You introduce the library in app.js, before you import your routes
 const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -25,6 +26,7 @@ app.use(middleware.requestLogger)
 
 // Routes configuration.
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', usersRouter)
 
 app.use(middleware.errorHandler)
 
