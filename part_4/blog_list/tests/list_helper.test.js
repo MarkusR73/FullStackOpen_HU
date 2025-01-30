@@ -8,7 +8,7 @@ const mostBlogs = require('../utils/list_helper').mostBlogs
 const mostLikes = require('../utils/list_helper').mostLikes
 const { listWithOneBlog, listWithMultipleBlogs } = require('./test_data')
 
-// Execute all: npm test -- --test-concurrency=1
+// Execute all: npm run tests
 // just this file: npm test ./tests/list_helper.test.js
 
 test('dummy returns one', () => {

@@ -8,7 +8,7 @@ const api = supertest(app)
 
 const User = require('../models/user')
 
-// Execute all: npm test -- --test-concurrency=1
+// Execute all: npm run tests
 // just this file: npm test ./tests/user_api.test.js
 
 beforeEach(async () => {

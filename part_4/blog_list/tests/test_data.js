@@ -60,7 +60,53 @@ const listWithMultipleBlogs = [
   },
 ]
 
+const listWithMultipleUserBlogs = [
+	{
+    url: 'https://reactpatterns.com/',
+    title: 'React patterns',
+    author: 'Michael Chan',
+    user: '6421e899e4b0d1cfa9e8be47', // example user ObjectId
+    likes: 7
+  },
+  {
+    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+    title: 'Go To Statement Considered Harmful',
+    author: 'Edsger W. Dijkstra',
+    user: '6421e899e4b0d1cfa9e8be47',
+    likes: 5
+  },
+  {
+    url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+    title: 'Canonical string reduction',
+    author: 'Edsger W. Dijkstra',
+    user: '6421e899e4b0d1cfa9e8be47',
+    likes: 12
+  },
+  {
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/05/05/TestDefinitions.htmll',
+    title: 'First class tests',
+    author: 'Robert C. Martin',
+    user: '6421e899e4b0d1cfa9e8be47',
+    likes: 10
+  },
+  {
+    url: 'http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html',
+    title: 'TDD harms architecture',
+    author: 'Robert C. Martin',
+    user: '6421e899e4b0d1cfa9e8be47',
+    likes: 0
+  },
+  {
+    url: 'http://blog.cleancoder.com/uncle-bob/2016/05/01/TypeWars.html',
+    title: 'Type wars',
+    author: 'Robert C. Martin',
+    user: '6421e899e4b0d1cfa9e8be47',
+    likes: 2
+  }
+]
+
 module.exports = {
   listWithOneBlog,
   listWithMultipleBlogs,
+	listWithMultipleUserBlogs
 }
