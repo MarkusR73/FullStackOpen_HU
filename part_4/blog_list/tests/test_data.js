@@ -61,7 +61,7 @@ const listWithMultipleBlogs = [
 ]
 
 const listWithMultipleUserBlogs = [
-	{
+  {
     url: 'https://reactpatterns.com/',
     title: 'React patterns',
     author: 'Michael Chan',
@@ -108,5 +108,5 @@ const listWithMultipleUserBlogs = [
 module.exports = {
   listWithOneBlog,
   listWithMultipleBlogs,
-	listWithMultipleUserBlogs
+  listWithMultipleUserBlogs
 }

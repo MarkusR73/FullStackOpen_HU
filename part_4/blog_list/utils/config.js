@@ -11,5 +11,5 @@ const testPassword = process.env.tPass
 module.exports = {
   PORT,
   MONGODB_URI,
-	testPassword
+  testPassword
 }

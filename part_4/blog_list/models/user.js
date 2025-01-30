@@ -2,22 +2,22 @@ const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
   blogs: [
-		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Blog'
-		}
-	],
-	username: {
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Blog'
+    }
+  ],
+  username: {
     type: String,
-		minLength: 3,
+    minLength: 3,
     required: true,
     unique: true
   },
   name: String,
   passwordHash: {
-		type: String,
-		required: true
-	}
+    type: String,
+    required: true
+  }
 })
 
 userSchema.set('toJSON', {
@@ -28,12 +28,12 @@ userSchema.set('toJSON', {
     // the passwordHash should not be revealed
     delete returnedObject.passwordHash
 
-		// Ensure consistent property ordering
+    // Ensure consistent property ordering
     return {
-			blogs: returnedObject.blogs,
+      blogs: returnedObject.blogs,
       username: returnedObject.username,
       name: returnedObject.name,
-			id: returnedObject.id
+      id: returnedObject.id
     }
   }
 })
