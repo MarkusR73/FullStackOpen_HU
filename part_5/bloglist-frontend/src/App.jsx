@@ -34,9 +34,9 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
-			//window.localStorage.setItem(
-      //  'loggedNoteappUser', JSON.stringify(user)
-      //) 
+			window.localStorage.setItem(
+        'loggedNoteappUser', JSON.stringify(user)
+      ) 
 			blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -47,6 +47,11 @@ const App = () => {
         setErrorMessage(null)
       }, 5000)
     }
+	}
+
+	const handleLogout = () => {
+		window.localStorage.removeItem('loggedNoteappUser')
+		setUser(null)
 	}
 
   return (
@@ -61,8 +66,11 @@ const App = () => {
 					setPassword={setPassword}
 				/> :
       	<div>
-        	<BlogForm />
-					<p>{user.name} logged-in</p>
+					<p>
+						{user.name} logged in
+						<button onClick={handleLogout}>logout</button>
+					</p>
+					<BlogForm />
 					{blogs.map(blog =>
         		<Blog key={blog.id} blog={blog} />
       		)}
