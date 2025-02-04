@@ -7,13 +7,14 @@ import { LoginForm, BlogForm } from './Forms'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-	const [title, setTitle] = useState([])
-	const [author, setAuthor] = useState([])
-	const [url, setUrl] = useState([])
+	const [title, setTitle] = useState('')
+	const [author, setAuthor] = useState('')
+	const [url, setUrl] = useState('')
 	const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
 	const [user, setUser] = useState(null)
 	const [errorMessage, setErrorMessage] = useState(null)
+	const [notification, setNotification] = useState({ message: null, type: null })
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -42,17 +43,19 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
+			setNotification({ message: 'Login successful!', type: 'success' })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
     } catch (exception) {
-      setErrorMessage('Wrong credentials')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 5000)
+      setNotification({ message: 'Wrong username or password!', type: 'error' })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
     }
 	}
 
 	const handleLogout = () => {
 		window.localStorage.removeItem('loggedNoteappUser')
 		setUser(null)
+		setNotification({ message: 'Logged out successfully!', type: 'success' })
+    setTimeout(() => setNotification({ message: null, type: null }), 5000)
 	}
 
 	const createBlog = async (event) => {
@@ -61,6 +64,8 @@ const App = () => {
     try {
       const newBlog = await blogService.create({ title, author, url })
 			setBlogs(blogs.concat(newBlog))
+			setNotification({ message: `A new blog ${title} by ${author} added!`, type: 'success' })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
       setTitle('')
       setAuthor('')
       setUrl('')
@@ -68,19 +73,18 @@ const App = () => {
 		catch (exception) {
 			if (exception.response) {
 				const { status, data } = exception.response
-				setErrorMessage(`Error ${status}: ${data.error}`)
-			} else {
-				setErrorMessage('An unexpected error occurred')
+				setNotification({ message: `Error ${status}: ${data.error}`, type: 'error' })
+			} 
+			else {
+				setNotification({ message: 'An unexpected error occurred!', type: 'error' })
 			}
-			setTimeout(() => {
-				setErrorMessage(null)
-			}, 5000)
+			setTimeout(() => setNotification({ message: null, type: null }), 5000)
     }
 	}
 
   return (
     <div>
-			<Notification message={errorMessage} />
+			<Notification message={notification.message} type={notification.type} />
 			{user === null ?
       	<LoginForm
 					handleLogin={handleLogin}
