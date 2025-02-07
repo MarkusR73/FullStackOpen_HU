@@ -6,16 +6,16 @@ const BlogForm = ({ createBlog }) => {
   const [url, setUrl] = useState('')
 
   const addBlog = (event) => {
-		event.preventDefault()
-		createBlog({
-			title: title.trim(),
-			author: author.trim(),
-			url: url.trim()
-		})
-		setTitle('')
-		setAuthor('')
-		setUrl('')
-	}
+    event.preventDefault()
+    createBlog({
+      title: title.trim(),
+      author: author.trim(),
+      url: url.trim()
+    })
+    setTitle('')
+    setAuthor('')
+    setUrl('')
+  }
   return(
     <div>
       <h2>Create new blog</h2>

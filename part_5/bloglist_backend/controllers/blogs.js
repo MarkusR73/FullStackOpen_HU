@@ -33,7 +33,8 @@ blogsRouter.post('/', middleware.tokenExtractor, middleware.userExtractor, async
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
-  response.status(201).json(savedBlog)
+  const populatedBlog = await savedBlog.populate('user', { username: 1, name: 1, id: 1 })
+  response.status(201).json(populatedBlog)
   // Using the express-async-errors library ensures that any exceptions
   // are automatically passed to the error-handling middleware.
 })

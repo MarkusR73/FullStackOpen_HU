@@ -83,7 +83,7 @@ const App = () => {
       setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
       setNotification({ message: `Blog "${returnedBlog.title}" updated successfully!`, type: 'success' })
       setTimeout(() => setNotification({ message: null, type: null }), 5000)
-    } 
+    }
     catch (error) {
       setNotification({ message: `Error occurred while updating blog: ${error.message}`, type: 'error' })
       setTimeout(() => setNotification({ message: null, type: null }), 5000)
@@ -96,7 +96,7 @@ const App = () => {
       setBlogs(blogs.filter(blog => blog.id !== id))
       setNotification({ message: 'Blog deleted successfully!', type: 'success' })
       setTimeout(() => setNotification({ message: null, type: null }), 5000)
-    } 
+    }
     catch (exception) {
       setNotification({ message: 'Error occurred while deleting the blog!', type: 'error' })
       setTimeout(() => setNotification({ message: null, type: null }), 5000)
@@ -128,7 +128,7 @@ const App = () => {
             .sort((a, b) => b.likes - a.likes)
             .map(blog =>
               <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} user={user} />
-          )}
+            )}
         </div>
       }
     </div>
