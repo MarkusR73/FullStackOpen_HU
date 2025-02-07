@@ -12,7 +12,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
   const [notification, setNotification] = useState({ message: null, type: null })
   const blogFormRef = useRef()
 
@@ -86,11 +85,23 @@ const App = () => {
       setTimeout(() => setNotification({ message: null, type: null }), 5000)
     } 
     catch (error) {
-      setNotification({ message: `Error updating blog: ${error.message}`, type: 'error' })
+      setNotification({ message: `Error occurred while updating blog: ${error.message}`, type: 'error' })
       setTimeout(() => setNotification({ message: null, type: null }), 5000)
     }
   }
-  
+
+  const deleteBlog = async (id) => {
+    try {
+      await blogService.remove(id)
+      setBlogs(blogs.filter(blog => blog.id !== id))
+      setNotification({ message: 'Blog deleted successfully!', type: 'success' })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+    } 
+    catch (exception) {
+      setNotification({ message: 'Error occurred while deleting the blog!', type: 'error' })
+      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+    }
+  }
 
   return (
     <div>
@@ -116,7 +127,7 @@ const App = () => {
             // sort blogs in descending order based on the number of likes
             .sort((a, b) => b.likes - a.likes)
             .map(blog =>
-              <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+              <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} user={user} />
           )}
         </div>
       }
