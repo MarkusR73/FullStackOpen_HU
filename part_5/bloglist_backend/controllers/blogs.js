@@ -64,8 +64,9 @@ blogsRouter.put('/:id', async (request, response) => {
     .findByIdAndUpdate(
       request.params.id,
       updatedBlogData,
-      { new: true, runValidators: true, context: 'query' }
+      { new: true, runValidators: true }
     )
+    .populate('user', { username: 1, name: 1, id: 1 })
   if (!updatedBlog) {
     return response.status(404).json({ error: 'Blog not found' })
   }
