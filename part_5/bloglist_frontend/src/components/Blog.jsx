@@ -3,13 +3,6 @@ import { useState } from 'react'
 const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   const [visible, setVisible] = useState(false)
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
   const toggleVisibility = () => {
     setVisible(!visible)
   }
@@ -32,20 +25,22 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
   const isUserBlogOwner = blog.user && user && blog.user.username === user.username
 
   return (
-    <div style={blogStyle}>
-      <div>
-        {`${blog.title}, by ${blog.author}`}
-        <button onClick={toggleVisibility}>
+    <div className="blog">
+      <div className="blog-summary">
+        <span className="blog-title">{blog.title}</span>, by <span className="blog-author">{blog.author}</span>
+        <button className="toggle-visibility-btn" onClick={toggleVisibility}>
           {visible ? 'hide' : 'view'}
         </button>
       </div>
       {visible && (
-        <div>
-          <p>{blog.url}</p>
-					Likes: {blog.likes} <button onClick={handleLike}>like</button>
-          <p>{blog.user.name}</p>
+        <div className="blog-details">
+          <p className="blog-url">{blog.url}</p>
+          <p className="blog-likes">
+            Likes: {blog.likes} <button onClick={handleLike}>like</button>
+          </p>
+          <p className="blog-user">{blog.user.name}</p>
           {isUserBlogOwner && (
-            <button onClick={handleDelete}>Delete</button>
+            <button className="delete-btn" onClick={handleDelete}>Delete</button>
           )}
         </div>
       )}
