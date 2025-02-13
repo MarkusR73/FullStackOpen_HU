@@ -27,7 +27,7 @@ describe('Blog app', () => {
   })
 
   describe('Login', () => {
-    test('succeeds with correct credentials', async ({ page }) => {
+    test('Succeeds with correct credentials', async ({ page }) => {
       await expect(page.getByText('log in to application')).toBeVisible()
 
       await expect(page.locator('[name="Username"]')).toBeVisible()
@@ -40,7 +40,7 @@ describe('Blog app', () => {
       await expect(page.getByText('Teppo Testaaja logged in')).toBeVisible()
     })
 
-    test('fails with wrong credentials', async ({ page }) => {
+    test('Fails with wrong credentials', async ({ page }) => {
       await expect(page.getByText('log in to application')).toBeVisible()
 
       await expect(page.locator('[name="Username"]')).toBeVisible()
@@ -51,6 +51,35 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'Login' }).click()
 
       await expect(page.getByText('Wrong username or password!')).toBeVisible()
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await expect(page.getByText('log in to application')).toBeVisible()
+      await page.locator('[name="Username"]').fill('TestiTepi88')
+      await page.locator('[name="Password"]').fill('T€nttu88')
+      await page.getByRole('button', { name: 'Login' }).click()
+      await expect(page.getByText('Teppo Testaaja logged in')).toBeVisible()
+    })
+  
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'New blog' }).click()
+
+      await expect(page.locator('[name="Title"]')).toBeVisible()
+      await page.locator('[name="Title"]').fill('Testataan blogin luontia')
+
+      await expect(page.locator('[name="Author"]')).toBeVisible()
+      await page.locator('[name="Author"]').fill('Jooseppi')
+
+      await expect(page.locator('[name="Url"]')).toBeVisible()
+      await page.locator('[name="Url"]').fill('www.tepi-testaa.fi')
+
+      await page.getByRole('button', { name: 'create' }).click()
+
+      await expect(page.getByText('A new blog "Testataan blogin luontia" by Jooseppi added!')).toBeVisible()
+      await expect(page.getByText('Testataan blogin luontia, by Jooseppi')).toBeVisible()
+      await expect(page.getByRole('button', { name: 'view' })).toBeVisible()
     })
   })
 })
