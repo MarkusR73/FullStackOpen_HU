@@ -102,5 +102,34 @@ describe('Blog app', () => {
       await page.getByRole('button', { name: 'like' }).click()
       await expect(page.getByText('Likes: 1')).toBeVisible()
     })
+
+    test('Existing blog can be deleted by the user who added it', async ({ page }) => {
+      // Create blog
+      await page.getByRole('button', { name: 'New blog' }).click()
+      await page.locator('[name="Title"]').fill('Testataan blogin poistamista')
+      await page.locator('[name="Author"]').fill('Jooseppi')
+      await page.locator('[name="Url"]').fill('www.tepi-testaa.fi')
+      await page.getByRole('button', { name: 'create' }).click()
+
+      const notification = page.locator('.notification')
+
+      await expect(notification).toHaveText('A new blog "Testataan blogin poistamista" by Jooseppi added!')
+      await expect(notification).toBeHidden()
+
+      // Delete created blog
+      
+      await page.getByRole('button', { name: 'view' }).click()
+      // Set up dialog listener before triggering the dialog
+      page.on('dialog', async dialog => {
+        expect(dialog.type()).toBe('confirm')
+        await dialog.accept() 
+      })
+      await expect(page.getByRole('button', { name: 'delete' })).toBeVisible()
+      await page.getByRole('button', { name: 'delete' }).click()
+
+      // Verify delete process is successful
+      await expect(notification).toHaveText('Blog deleted successfully!')
+      await expect(page.getByText('Testataan blogin poistamista')).not.toBeVisible()
+    })
   })
 })

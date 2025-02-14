@@ -40,7 +40,7 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
           </p>
           <p className="blog-user">{blog.user.name}</p>
           {isUserBlogOwner && (
-            <button className="delete-btn" onClick={handleDelete}>Delete</button>
+            <button className="delete-btn" onClick={handleDelete}>delete</button>
           )}
         </div>
       )}

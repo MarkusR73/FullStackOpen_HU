@@ -43,10 +43,10 @@ const App = () => {
       setUsername('')
       setPassword('')
       setNotification({ message: 'Login successful!', type: 'success' })
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     } catch (exception) {
       setNotification({ message: 'Wrong username or password!', type: 'error' })
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
   }
 
@@ -54,7 +54,7 @@ const App = () => {
     window.localStorage.removeItem('loggedNoteappUser')
     setUser(null)
     setNotification({ message: 'Logged out successfully!', type: 'success' })
-    setTimeout(() => setNotification({ message: null, type: null }), 5000)
+    setTimeout(() => setNotification({ message: null, type: null }), 3000)
   }
 
   const createBlog = async (blogObject) => {
@@ -62,7 +62,7 @@ const App = () => {
       const newBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(newBlog))
       setNotification({ message: `A new blog "${blogObject.title}" by ${blogObject.author} added!`, type: 'success' })
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
       blogFormRef.current.toggleVisibility()
     }
     catch (exception) {
@@ -73,7 +73,7 @@ const App = () => {
       else {
         setNotification({ message: 'An unexpected error occurred!', type: 'error' })
       }
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
   }
 
@@ -82,11 +82,11 @@ const App = () => {
       const returnedBlog = await blogService.update(id, updatedBlog)
       setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
       setNotification({ message: `Blog "${returnedBlog.title}" updated successfully!`, type: 'success' })
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
     catch (error) {
       setNotification({ message: `Error occurred while updating blog: ${error.message}`, type: 'error' })
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
   }
 
@@ -95,11 +95,11 @@ const App = () => {
       await blogService.remove(id)
       setBlogs(blogs.filter(blog => blog.id !== id))
       setNotification({ message: 'Blog deleted successfully!', type: 'success' })
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
     catch (exception) {
       setNotification({ message: 'Error occurred while deleting the blog!', type: 'error' })
-      setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
   }
 
