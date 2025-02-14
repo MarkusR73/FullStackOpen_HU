@@ -50,7 +50,11 @@ describe('Blog app', () => {
 
       await page.getByRole('button', { name: 'Login' }).click()
 
-      await expect(page.getByText('Wrong username or password!')).toBeVisible()
+      await expect(page.locator('.error')).toContainText('Wrong username or password!')
+      await expect(page.locator('.error')).toHaveCSS('border-style', 'solid')
+      await expect(page.locator('.error')).toHaveCSS('color', 'rgb(255, 0, 0)')
+
+      await expect(page.getByText('Teppo Testaaja logged in')).not.toBeVisible()
     })
   })
 
@@ -63,7 +67,7 @@ describe('Blog app', () => {
       await expect(page.getByText('Teppo Testaaja logged in')).toBeVisible()
     })
   
-    test('a new blog can be created', async ({ page }) => {
+    test('A new blog can be created', async ({ page }) => {
       await page.getByRole('button', { name: 'New blog' }).click()
 
       await expect(page.locator('[name="Title"]')).toBeVisible()
@@ -80,6 +84,23 @@ describe('Blog app', () => {
       await expect(page.getByText('A new blog "Testataan blogin luontia" by Jooseppi added!')).toBeVisible()
       await expect(page.getByText('Testataan blogin luontia, by Jooseppi')).toBeVisible()
       await expect(page.getByRole('button', { name: 'view' })).toBeVisible()
+    })
+
+    test('Existing blog can be liked', async ({ page }) => {
+      // Create blog
+      await page.getByRole('button', { name: 'New blog' }).click()
+      await page.locator('[name="Title"]').fill('Testataan blogin tykkäämistä')
+      await page.locator('[name="Author"]').fill('Jooseppi')
+      await page.locator('[name="Url"]').fill('www.tepi-testaa.fi')
+      await page.getByRole('button', { name: 'create' }).click()
+      await expect(page.getByText('A new blog "Testataan blogin tykkäämistä" by Jooseppi added!')).toBeVisible()
+
+      // Like created blog
+      await page.getByRole('button', { name: 'view' }).click()
+      await expect(page.getByText('Likes: 0')).toBeVisible()
+      await expect(page.getByRole('button', { name: 'like' })).toBeVisible()
+      await page.getByRole('button', { name: 'like' }).click()
+      await expect(page.getByText('Likes: 1')).toBeVisible()
     })
   })
 })
