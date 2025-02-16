@@ -1,30 +1,19 @@
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+import { loginWith, createBlog, verifyNotification, createUser, getLikes } from './helper.js'
 
 //npm run test:report
 
 describe('Blog app', () => {
   beforeEach(async ({ page, request }) => {
-    await request.post('http://localhost:3003/api/testing/reset')
-    await request.post('http://localhost:3003/api/users', {
-      data: {
-        name: 'Teppo Testaaja',
-        username: 'TestiTepi88',
-        password: 'T€nttu88'
-      }
-    })
-    await request.post('http://localhost:3003/api/users', {
-      data: {
-        name: 'Matti Meikäläinen',
-        username: 'MasaM89',
-        password: 'M@tt189'
-      }
-    })
-    await page.goto('http://localhost:5173')
+    await request.post('/api/testing/reset')
+    await createUser(request, 'Teppo Testaaja', 'TestiTepi88', 'T€nttu88')
+    await createUser(request, 'Matti Meikäläinen', 'MasaM89', 'M@tt189')
+    await page.goto('/')
   })
 
   test('Login form is shown', async ({ page }) => {
     const header = await page.getByText('log in to application')
-    await expect(header).toBeVisible()
+    await expect(page.getByText('log in to application')).toBeVisible()
 
     await expect(page.locator('[name="Username"]')).toBeVisible()
     await expect(page.locator('[name="Password"]')).toBeVisible()
@@ -36,31 +25,15 @@ describe('Blog app', () => {
   describe('Login', () => {
     test('Succeeds with correct credentials', async ({ page }) => {
       await expect(page.getByText('log in to application')).toBeVisible()
-
-      await expect(page.locator('[name="Username"]')).toBeVisible()
-      await page.locator('[name="Username"]').fill('TestiTepi88')
-      await expect(page.locator('[name="Password"]')).toBeVisible()
-      await page.locator('[name="Password"]').fill('T€nttu88')
-
-      await page.getByRole('button', { name: 'Login' }).click()
-
+      await loginWith(page, 'TestiTepi88', 'T€nttu88')
+      await verifyNotification(page, '.notification', 'Login successful!', 'solid', 'rgb(0, 128, 0)')
       await expect(page.getByText('Teppo Testaaja logged in')).toBeVisible()
     })
 
     test('Fails with wrong credentials', async ({ page }) => {
       await expect(page.getByText('log in to application')).toBeVisible()
-
-      await expect(page.locator('[name="Username"]')).toBeVisible()
-      await page.locator('[name="Username"]').fill('TestiTepi89')
-      await expect(page.locator('[name="Password"]')).toBeVisible()
-      await page.locator('[name="Password"]').fill('T€nttu89')
-
-      await page.getByRole('button', { name: 'Login' }).click()
-
-      await expect(page.locator('.error')).toContainText('Wrong username or password!')
-      await expect(page.locator('.error')).toHaveCSS('border-style', 'solid')
-      await expect(page.locator('.error')).toHaveCSS('color', 'rgb(255, 0, 0)')
-
+      await loginWith(page, 'TestiTepi89', 'T€nttu89')
+      await verifyNotification(page, '.error', 'Wrong username or password!', 'solid', 'rgb(255, 0, 0)')
       await expect(page.getByText('Teppo Testaaja logged in')).not.toBeVisible()
     })
   })
@@ -68,84 +41,104 @@ describe('Blog app', () => {
   describe('When logged in', () => {
     beforeEach(async ({ page }) => {
       await expect(page.getByText('log in to application')).toBeVisible()
-      await page.locator('[name="Username"]').fill('TestiTepi88')
-      await page.locator('[name="Password"]').fill('T€nttu88')
-      await page.getByRole('button', { name: 'Login' }).click()
+      await loginWith(page, 'TestiTepi88', 'T€nttu88')
       await expect(page.getByText('Teppo Testaaja logged in')).toBeVisible()
     })
   
     test('A new blog can be created', async ({ page }) => {
-      await page.getByRole('button', { name: 'New blog' }).click()
-
-      await expect(page.locator('[name="Title"]')).toBeVisible()
-      await page.locator('[name="Title"]').fill('Testataan blogin luontia')
-
-      await expect(page.locator('[name="Author"]')).toBeVisible()
-      await page.locator('[name="Author"]').fill('Jooseppi')
-
-      await expect(page.locator('[name="Url"]')).toBeVisible()
-      await page.locator('[name="Url"]').fill('www.tepi-testaa.fi')
-
-      await page.getByRole('button', { name: 'create' }).click()
-
-      await expect(page.getByText('A new blog "Testataan blogin luontia" by Jooseppi added!')).toBeVisible()
+      await createBlog(page, 'Testataan blogin luontia', 'Jooseppi', 'www.tepi-testaa.fi')
+      await verifyNotification(page, '.notification', 'A new blog "Testataan blogin luontia" by Jooseppi added!', 'solid', 'rgb(0, 128, 0)') 
       await expect(page.getByText('Testataan blogin luontia, by Jooseppi')).toBeVisible()
-      await expect(page.getByRole('button', { name: 'view' })).toBeVisible()
     })
-    describe('Operations on existing blog', () => {
+
+    describe('Operations on existing blogs', () => {
+      let blog1, blog2, blog3
+
       beforeEach(async ({ page }) => {
-        await page.getByRole('button', { name: 'New blog' }).click()
-        await page.locator('[name="Title"]').fill('Testataan blogin toimintoja')
-        await page.locator('[name="Author"]').fill('Jooseppi')
-        await page.locator('[name="Url"]').fill('www.tepi-testaa.fi')
-        await page.getByRole('button', { name: 'create' }).click()
-        await expect(page.locator('.notification')).toHaveText('A new blog "Testataan blogin toimintoja" by Jooseppi added!')
-        await expect(page.locator('.notification')).toBeHidden()
+        await createBlog(page, 'Testataan blogin toimintoja', 'Jooseppi', 'www.tepi-testaa.fi')
+        await verifyNotification(page, '.notification', 'A new blog "Testataan blogin toimintoja" by Jooseppi added!', 'solid', 'rgb(0, 128, 0)')  
+        blog1 = page.locator('.blog:has-text("Testataan blogin toimintoja")')
       })
 
       test('Existing blog can be liked', async ({ page }) => {
-        await page.getByRole('button', { name: 'view' }).click()
-        await expect(page.getByText('Likes: 0')).toBeVisible()
-        await expect(page.getByRole('button', { name: 'like' })).toBeVisible()
-        await page.getByRole('button', { name: 'like' }).click()
-        await expect(page.getByText('Likes: 1')).toBeVisible()
+        await blog1.getByRole('button', { name: 'view' }).click()
+        const likesBefore = await getLikes(blog1)
+        await blog1.getByRole('button', { name: 'like' }).click()
+        await page.waitForTimeout(100)
+        const likesAfter = await getLikes(blog1)
+        expect(likesAfter).toBe(likesBefore + 1)
       })
 
       test('Existing blog can be deleted by the user who added it', async ({ page }) => {
-        const notification = page.locator('.notification')
-        await page.getByRole('button', { name: 'view' }).click()
+        await blog1.getByRole('button', { name: 'view' }).click()
         // Set up dialog listener before triggering the dialog
         page.on('dialog', async dialog => {
           expect(dialog.type()).toBe('confirm')
           await dialog.accept() 
         })
-        await expect(page.getByRole('button', { name: 'delete' })).toBeVisible()
-        await page.getByRole('button', { name: 'delete' }).click()
+        await blog1.getByRole('button', { name: 'delete' }).click()
 
         // Verify delete process is successful
-        await expect(notification).toHaveText('Blog deleted successfully!')
+        await verifyNotification(page, '.notification', 'Blog deleted successfully!', 'solid', 'rgb(0, 128, 0)')
         await expect(page.getByText('Testataan blogin toimintoja')).not.toBeVisible()
       })
 
       test('Only the user who added the blog sees the delete button', async ({ page }) => {
         // Verify that delete button is visible for Teppo Testaaja
-        await page.getByRole('button', { name: 'view' }).click()
-        await expect(page.getByRole('button', { name: 'delete' })).toBeVisible()
+        await blog1.getByRole('button', { name: 'view' }).click()
+        await expect(blog1.getByRole('button', { name: 'delete' })).toBeVisible()
 
         // Log out user Teppo Testaaja
         await page.getByRole('button', { name: 'logout' }).click()
 	      await expect(page.getByText('log in to application')).toBeVisible()
 
         // Log in as Matti Meikäläinen
-        await page.locator('[name="Username"]').fill('MasaM89');
-        await page.locator('[name="Password"]').fill('M@tt189');
-        await page.getByRole('button', { name: 'Login' }).click();
+        await loginWith(page, 'MasaM89', 'M@tt189')
         await expect(page.getByText('Matti Meikäläinen logged in')).toBeVisible()
 
-        // Ensure that delete button si not visible
-        await page.getByRole('button', { name: 'view' }).click()
-        await expect(page.getByRole('button', { name: 'hide' })).toBeVisible()
-        await expect(page.getByRole('button', { name: 'delete' })).not.toBeVisible()
+        // Ensure that delete button is not visible
+        await blog1.getByRole('button', { name: 'view' }).click()
+        await expect(blog1.getByRole('button', { name: 'hide' })).toBeVisible()
+        await expect(blog1.getByRole('button', { name: 'delete' })).not.toBeVisible()
+      })
+
+      test('Blogs are ordered by number of likes in descending order', async ({ page }) => {
+        await createBlog(page, 'Toinen testi blogi', 'Toope', 'www.tt.fi')
+        await verifyNotification(page, '.notification', 'A new blog "Toinen testi blogi" by Toope added!', 'solid', 'rgb(0, 128, 0)')  
+        blog2 = page.locator('.blog:has-text("Toinen testi blogi")')
+        await createBlog(page, 'Kolmonen', 'Jape', 'www.ivsmo.fi')
+        await verifyNotification(page, '.notification', 'A new blog "Kolmonen" by Jape added!', 'solid', 'rgb(0, 128, 0)')  
+        blog3 = page.locator('.blog:has-text("Kolmonen")')
+
+        await blog1.getByRole('button', { name: 'view' }).click()
+        await blog1.getByRole('button', { name: 'like' }).click()
+        await page.waitForTimeout(100)
+        const likes1 = await getLikes(blog1)
+        expect(likes1).toBe(1)
+
+        await blog2.getByRole('button', { name: 'view' }).click()
+        await blog2.getByRole('button', { name: 'like' }).click()
+        await page.waitForTimeout(100)
+        await blog2.getByRole('button', { name: 'like' }).click()
+        await page.waitForTimeout(100)
+        const likes2 = await getLikes(blog2)
+        expect(likes2).toBe(2)
+
+        await blog3.getByRole('button', { name: 'view' }).click()
+        await blog3.getByRole('button', { name: 'like' }).click()
+        await page.waitForTimeout(100)
+        await blog3.getByRole('button', { name: 'like' }).click()
+        await page.waitForTimeout(100)
+        await blog3.getByRole('button', { name: 'like' }).click()
+        await page.waitForTimeout(100)
+        const likes3 = await getLikes(blog3)
+        expect(likes3).toBe(3)
+
+        const blogElements = await page.locator('.blog').allTextContents()
+
+        expect(blogElements[0]).toContain('Kolmonen')  
+        expect(blogElements[1]).toContain('Toinen testi blogi') 
+        expect(blogElements[2]).toContain('Testataan blogin toimintoja')
       })
     })
   })
