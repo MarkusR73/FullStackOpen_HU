@@ -32,7 +32,7 @@ const reducer = (state = initialState, action) => {
       return state.map(anecdote =>
         anecdote.id !== id ? anecdote : updatedAnecdote
       )
-    case 'ADD_ANECDOTE':
+    case 'ADD':
       return [...state, action.payload]
     default:
       return state
@@ -48,11 +48,11 @@ export const voteAnecdote = (id) => {
 
 export const addAnecdote = (content) => {
   return {
-    type: 'ADD_ANECDOTE',
+    type: 'ADD',
     payload: {
       content,
-      votes: 0,
-      id: getId()
+      id: getId(),
+      votes: 0
     }
   }
 }
