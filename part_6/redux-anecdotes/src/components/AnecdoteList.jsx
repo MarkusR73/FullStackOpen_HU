@@ -3,21 +3,21 @@ import { voteAnecdote } from '../reducers/anecdoteReducer'
 import { setNotification } from '../reducers/notificationReducer'
 
 const AnecdoteList = () => {
-	const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
   const anecdotes = useSelector(({ anecdotes, filter }) => {
-		return [...anecdotes]
-			.filter((a) => a.content.toLowerCase().includes(filter.toLowerCase()))
-			.sort((a, b) => b.votes - a.votes)
-	})
+    return [...anecdotes]
+      .filter((a) => a.content.toLowerCase().includes(filter.toLowerCase()))
+      .sort((a, b) => b.votes - a.votes)
+  })
 
-	const vote = (id, content) => {
-		dispatch(voteAnecdote(id))
+  const vote = (id, content) => {
+    dispatch(voteAnecdote(id))
     dispatch(setNotification(`You voted for: "${content}"`, 5))
-	}
+  }
 
-	return (
-		<div>
+  return (
+    <div>
       {anecdotes.map(anecdote => 
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
@@ -27,8 +27,8 @@ const AnecdoteList = () => {
           </div>
         </div>
       )}
-		</div>
-	)
+    </div>
+  )
 }
 
 export default AnecdoteList
