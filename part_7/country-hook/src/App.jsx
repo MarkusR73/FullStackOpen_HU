@@ -22,9 +22,9 @@ const useCountry = (name) => {
     if (!name) return
 
     const fetchCountry = async () => {
-			const countryData = await getCountry(name)
-			setCountry(countryData)
-		}
+      const countryData = await getCountry(name)
+      setCountry(countryData)
+    }
     fetchCountry()
   }, [name])
   return country
