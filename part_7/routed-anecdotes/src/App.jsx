@@ -66,6 +66,12 @@ const CreateNew = (props) => {
 
   const navigate = useNavigate()
 
+  const handleReset = (e) => {
+    e.preventDefault()
+    content.onReset()
+    author.onReset()
+    info.onReset()
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -91,7 +97,8 @@ const CreateNew = (props) => {
         info:
           <input {...info} />
         <br/>
-        <button>create</button>
+        <button type="submit">create</button>
+        <button type="button" onClick={handleReset}>reset</button>
       </form>
     </div>
   )
