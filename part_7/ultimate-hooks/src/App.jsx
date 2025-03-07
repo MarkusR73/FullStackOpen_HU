@@ -9,8 +9,8 @@ const useField = (type) => {
   }
 
   const reset = () => {
-		setValue('')
-	}
+    setValue('')
+  }
 
   return {
     type,
@@ -23,13 +23,13 @@ const useField = (type) => {
 const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
-	useEffect(() => {
-		const fetchResources = async () => {
-			const response = await axios.get(baseUrl)
-			setResources(response.data)
-		}
-		fetchResources()
-	}, [baseUrl])
+  useEffect(() => {
+    const fetchResources = async () => {
+      const response = await axios.get(baseUrl)
+      setResources(response.data)
+    }
+    fetchResources()
+  }, [baseUrl])
 
   const create = async (resource) => {
     const response = await axios.post(baseUrl, resource)
