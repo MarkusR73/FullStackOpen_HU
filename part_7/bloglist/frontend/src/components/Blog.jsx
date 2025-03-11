@@ -22,12 +22,14 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
     }
   }
   // Check if both blog.user and user are defined & compare username of the user who added the blog with the currently logged-in user's username
-  const isUserBlogOwner = blog.user && user && blog.user.username === user.username
+  const isUserBlogOwner =
+    blog.user && user && blog.user.username === user.username
 
   return (
     <div className="blog">
       <div className="blog-summary">
-        <span className="blog-title">{blog.title}</span>, by <span className="blog-author">{blog.author}</span>
+        <span className="blog-title">{blog.title}</span>, by{' '}
+        <span className="blog-author">{blog.author}</span>
         <button className="toggle-visibility-btn" onClick={toggleVisibility}>
           {visible ? 'hide' : 'view'}
         </button>
@@ -40,7 +42,9 @@ const Blog = ({ blog, updateBlog, deleteBlog, user }) => {
           </p>
           <p className="blog-user">{blog.user.name}</p>
           {isUserBlogOwner && (
-            <button className="delete-btn" onClick={handleDelete}>delete</button>
+            <button className="delete-btn" onClick={handleDelete}>
+              delete
+            </button>
           )}
         </div>
       )}

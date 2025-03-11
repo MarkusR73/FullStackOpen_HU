@@ -12,13 +12,14 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState({ message: null, type: null })
+  const [notification, setNotification] = useState({
+    message: null,
+    type: null
+  })
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs(blogs)
-    )
+    blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
 
   useEffect(() => {
@@ -35,9 +36,7 @@ const App = () => {
 
     try {
       const user = await loginService.login({ username, password })
-      window.localStorage.setItem(
-        'loggedNoteappUser', JSON.stringify(user)
-      )
+      window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -61,17 +60,24 @@ const App = () => {
     try {
       const newBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(newBlog))
-      setNotification({ message: `A new blog "${blogObject.title}" by ${blogObject.author} added!`, type: 'success' })
+      setNotification({
+        message: `A new blog "${blogObject.title}" by ${blogObject.author} added!`,
+        type: 'success'
+      })
       setTimeout(() => setNotification({ message: null, type: null }), 3000)
       blogFormRef.current.toggleVisibility()
-    }
-    catch (exception) {
+    } catch (exception) {
       if (exception.response) {
         const { status, data } = exception.response
-        setNotification({ message: `Error ${status}: ${data.error}`, type: 'error' })
-      }
-      else {
-        setNotification({ message: 'An unexpected error occurred!', type: 'error' })
+        setNotification({
+          message: `Error ${status}: ${data.error}`,
+          type: 'error'
+        })
+      } else {
+        setNotification({
+          message: 'An unexpected error occurred!',
+          type: 'error'
+        })
       }
       setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
@@ -80,12 +86,17 @@ const App = () => {
   const updateBlog = async (id, updatedBlog) => {
     try {
       const returnedBlog = await blogService.update(id, updatedBlog)
-      setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
-      setNotification({ message: `Blog "${returnedBlog.title}" updated successfully!`, type: 'success' })
+      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)))
+      setNotification({
+        message: `Blog "${returnedBlog.title}" updated successfully!`,
+        type: 'success'
+      })
       setTimeout(() => setNotification({ message: null, type: null }), 3000)
-    }
-    catch (error) {
-      setNotification({ message: `Error occurred while updating blog: ${error.message}`, type: 'error' })
+    } catch (error) {
+      setNotification({
+        message: `Error occurred while updating blog: ${error.message}`,
+        type: 'error'
+      })
       setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
   }
@@ -93,12 +104,17 @@ const App = () => {
   const deleteBlog = async (id) => {
     try {
       await blogService.remove(id)
-      setBlogs(blogs.filter(blog => blog.id !== id))
-      setNotification({ message: 'Blog deleted successfully!', type: 'success' })
+      setBlogs(blogs.filter((blog) => blog.id !== id))
+      setNotification({
+        message: 'Blog deleted successfully!',
+        type: 'success'
+      })
       setTimeout(() => setNotification({ message: null, type: null }), 3000)
-    }
-    catch (exception) {
-      setNotification({ message: 'Error occurred while deleting the blog!', type: 'error' })
+    } catch (exception) {
+      setNotification({
+        message: 'Error occurred while deleting the blog!',
+        type: 'error'
+      })
       setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
   }
@@ -106,14 +122,15 @@ const App = () => {
   return (
     <div>
       <Notification message={notification.message} type={notification.type} />
-      {user === null ?
+      {user === null ? (
         <LoginForm
           handleLogin={handleLogin}
           username={username}
           setUsername={setUsername}
           password={password}
           setPassword={setPassword}
-        /> :
+        />
+      ) : (
         <div>
           <h1>blogs</h1>
           <p>
@@ -126,11 +143,17 @@ const App = () => {
           {[...blogs]
             // sort blogs in descending order based on the number of likes
             .sort((a, b) => b.likes - a.likes)
-            .map(blog =>
-              <Blog key={blog.id} blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} user={user} />
-            )}
+            .map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                updateBlog={updateBlog}
+                deleteBlog={deleteBlog}
+                user={user}
+              />
+            ))}
         </div>
-      }
+      )}
     </div>
   )
 }
