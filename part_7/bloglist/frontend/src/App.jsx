@@ -6,17 +6,20 @@ import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import {
+  useNotificationValue,
+  useNotificationDispatch
+} from './contexts/NotificationContext'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState({
-    message: null,
-    type: null
-  })
   const blogFormRef = useRef()
+
+  const notification = useNotificationValue()
+  const notificationDispatch = useNotificationDispatch()
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -31,6 +34,16 @@ const App = () => {
     }
   }, [])
 
+  const notify = (message, type) => {
+    notificationDispatch({
+      type: 'SET_NOTIFICATION',
+      payload: { message, type }
+    })
+    setTimeout(() => {
+      notificationDispatch({ type: 'CLEAR_NOTIFICATION' })
+    }, 3000)
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -41,45 +54,34 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      setNotification({ message: 'Login successful!', type: 'success' })
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
+      notify('Login successful!', 'success')
     } catch (exception) {
-      setNotification({ message: 'Wrong username or password!', type: 'error' })
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
+      notify('Wrong username or password!', 'error')
     }
   }
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedNoteappUser')
     setUser(null)
-    setNotification({ message: 'Logged out successfully!', type: 'success' })
-    setTimeout(() => setNotification({ message: null, type: null }), 3000)
+    notify('Logged out successfully!', 'success')
   }
 
   const createBlog = async (blogObject) => {
     try {
       const newBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(newBlog))
-      setNotification({
-        message: `A new blog "${blogObject.title}" by ${blogObject.author} added!`,
-        type: 'success'
-      })
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
+      notify(
+        `A new blog "${blogObject.title}" by ${blogObject.author} added!`,
+        'success'
+      )
       blogFormRef.current.toggleVisibility()
     } catch (exception) {
       if (exception.response) {
         const { status, data } = exception.response
-        setNotification({
-          message: `Error ${status}: ${data.error}`,
-          type: 'error'
-        })
+        notify(`Error ${status}: ${data.error}`, 'error')
       } else {
-        setNotification({
-          message: 'An unexpected error occurred!',
-          type: 'error'
-        })
+        notify('An unexpected error occurred!', 'error')
       }
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
     }
   }
 
@@ -87,17 +89,9 @@ const App = () => {
     try {
       const returnedBlog = await blogService.update(id, updatedBlog)
       setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)))
-      setNotification({
-        message: `Blog "${returnedBlog.title}" updated successfully!`,
-        type: 'success'
-      })
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
+      notify(`Blog "${returnedBlog.title}" updated successfully!`, 'success')
     } catch (error) {
-      setNotification({
-        message: `Error occurred while updating blog: ${error.message}`,
-        type: 'error'
-      })
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
+      notify(`Error occurred while updating blog: ${error.message}`, 'error')
     }
   }
 
@@ -105,23 +99,15 @@ const App = () => {
     try {
       await blogService.remove(id)
       setBlogs(blogs.filter((blog) => blog.id !== id))
-      setNotification({
-        message: 'Blog deleted successfully!',
-        type: 'success'
-      })
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
+      notify('Blog deleted successfully!', 'success')
     } catch (exception) {
-      setNotification({
-        message: 'Error occurred while deleting the blog!',
-        type: 'error'
-      })
-      setTimeout(() => setNotification({ message: null, type: null }), 3000)
+      notify('Error occurred while deleting the blog!', 'error')
     }
   }
 
   return (
     <div>
-      <Notification message={notification.message} type={notification.type} />
+      <Notification message={notification?.message} type={notification?.type} />
       {user === null ? (
         <LoginForm
           handleLogin={handleLogin}
