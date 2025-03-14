@@ -7,6 +7,7 @@ import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import Users from './Views/Users'
+import UserView from './Views/User'
 import {
   useNotificationValue,
   useNotificationDispatch
@@ -137,6 +138,7 @@ const App = () => {
             </p>
             <Routes>
               <Route path="/users" element={<Users />} />
+              <Route path="/users/:id" element={<UserView />} />
               <Route
                 path="/"
                 element={
