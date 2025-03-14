@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import Notification from './components/Notification'
@@ -10,27 +10,28 @@ import {
   useNotificationValue,
   useNotificationDispatch
 } from './contexts/NotificationContext'
+import { useUserValue, useUserDispatch } from './contexts/UserContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const App = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
   const notification = useNotificationValue()
   const notificationDispatch = useNotificationDispatch()
 
+  const user = useUserValue()
+  const userDispatch = useUserDispatch()
+
   const queryClient = useQueryClient()
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      userDispatch({ type: 'SET_USER', payload: user })
       blogService.setToken(user.token)
     }
-  }, [])
+  }, [userDispatch])
 
   const notify = (message, type) => {
     notificationDispatch({
@@ -42,25 +43,9 @@ const App = () => {
     }, 3000)
   }
 
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
-    try {
-      const user = await loginService.login({ username, password })
-      window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
-      notify('Login successful!', 'success')
-    } catch (exception) {
-      notify('Wrong username or password!', 'error')
-    }
-  }
-
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedNoteappUser')
-    setUser(null)
+    window.localStorage.removeItem('loggedBlogappUser')
+    userDispatch({ type: 'LOGOUT' })
     notify('Logged out successfully!', 'success')
   }
 
@@ -137,13 +122,7 @@ const App = () => {
     <div>
       <Notification message={notification?.message} type={notification?.type} />
       {user === null ? (
-        <LoginForm
-          handleLogin={handleLogin}
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-        />
+        <LoginForm />
       ) : (
         <div>
           <h1>blogs</h1>
