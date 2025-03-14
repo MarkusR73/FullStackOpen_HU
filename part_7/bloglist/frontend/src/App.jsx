@@ -1,13 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Blog from './components/Blog'
 import blogService from './services/blogs'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
-import Users from './Views/Users'
-import UserView from './Views/User'
+import Users from './views/Users'
+import UserView from './views/User'
+import BlogList from './views/BlogList'
+import BlogView from './views/BlogView'
 import {
   useNotificationValue,
   useNotificationDispatch
@@ -76,39 +77,6 @@ const App = () => {
     createBlogMutation.mutate(newBlog)
   }
 
-  const updateBlogMutation = useMutation({
-    mutationFn: ({ id, updatedBlog }) => blogService.update(id, updatedBlog),
-    onSuccess: (updatedBlog) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs'] })
-      notify(`Blog "${updatedBlog.title}" updated successfully!`, 'success')
-    },
-    onError: (error) => {
-      notify(`Error occurred while updating blog: ${error.message}`, 'error')
-    }
-  })
-
-  const updateBlog = (id, blog) => {
-    updateBlogMutation.mutate({
-      id: id,
-      updatedBlog: { ...blog }
-    })
-  }
-
-  const deleteBlogMutation = useMutation({
-    mutationFn: ({ id }) => blogService.remove(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries(['blogs'])
-      notify('Blog deleted successfully!', 'success')
-    },
-    onError: (error) => {
-      notify('Error occurred while deleting the blog!', 'error')
-    }
-  })
-
-  const deleteBlog = async (id) => {
-    deleteBlogMutation.mutate({ id: id })
-  }
-
   const result = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
@@ -146,21 +114,11 @@ const App = () => {
                     <Togglable buttonLabel="New blog" ref={blogFormRef}>
                       <BlogForm createBlog={createBlog} />
                     </Togglable>
-                    {[...blogs]
-                      // sort blogs in descending order based on the number of likes
-                      .sort((a, b) => b.likes - a.likes)
-                      .map((blog) => (
-                        <Blog
-                          key={blog.id}
-                          blog={blog}
-                          updateBlog={updateBlog}
-                          deleteBlog={deleteBlog}
-                          user={user}
-                        />
-                      ))}
+                    <BlogList blogs={blogs} notify={notify} />
                   </div>
                 }
               />
+              <Route path="/blogs/:id" element={<BlogView notify={notify} />} />
             </Routes>
           </div>
         )}

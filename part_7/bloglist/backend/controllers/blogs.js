@@ -14,6 +14,11 @@ blogsRouter.get('/', async (request, response) => {
   // are automatically passed to the error-handling middleware.
 })
 
+blogsRouter.get('/:id', async (request, response) => {
+  const blog = await Blog.findById(request.params.id).populate('user', { name: 1 })
+  response.json(blog)
+})
+
 // Route to add a new blog
 blogsRouter.post('/', middleware.tokenExtractor, middleware.userExtractor, async (request, response) => {
   const body = request.body
@@ -59,7 +64,7 @@ blogsRouter.delete('/:id', middleware.tokenExtractor, middleware.userExtractor, 
 blogsRouter.put('/:id', middleware.tokenExtractor, middleware.userExtractor, async (request, response) => {
   const { title, author, url, likes, user } = request.body
 
-  const updatedBlogData = { title, author, url, likes, user }
+  const updatedBlogData = { title, author, url, likes, user: user.id }
 
   const updatedBlog = await Blog
     .findByIdAndUpdate(
@@ -67,7 +72,7 @@ blogsRouter.put('/:id', middleware.tokenExtractor, middleware.userExtractor, asy
       updatedBlogData,
       { new: true, runValidators: true }
     )
-    .populate('user', { username: 1, name: 1, id: 1 })
+    .populate('user', { name: 1, id: 1 })
   if (!updatedBlog) {
     return response.status(404).json({ error: 'Blog not found' })
   }
