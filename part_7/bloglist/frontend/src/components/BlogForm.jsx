@@ -7,11 +7,12 @@ const BlogForm = ({ createBlog }) => {
 
   const addBlog = (event) => {
     event.preventDefault()
-    createBlog({
+    const newBlog = {
       title: title.trim(),
       author: author.trim(),
       url: url.trim()
-    })
+    }
+    createBlog(newBlog)
     setTitle('')
     setAuthor('')
     setUrl('')

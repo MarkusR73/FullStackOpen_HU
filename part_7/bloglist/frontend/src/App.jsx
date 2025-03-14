@@ -10,9 +10,9 @@ import {
   useNotificationValue,
   useNotificationDispatch
 } from './contexts/NotificationContext'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -21,9 +21,7 @@ const App = () => {
   const notification = useNotificationValue()
   const notificationDispatch = useNotificationDispatch()
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
@@ -66,44 +64,74 @@ const App = () => {
     notify('Logged out successfully!', 'success')
   }
 
-  const createBlog = async (blogObject) => {
-    try {
-      const newBlog = await blogService.create(blogObject)
-      setBlogs(blogs.concat(newBlog))
+  const createBlogMutation = useMutation({
+    mutationFn: (newBlog) => blogService.create(newBlog),
+    onSuccess: (newBlog) => {
+      queryClient.invalidateQueries(['blogs'])
       notify(
-        `A new blog "${blogObject.title}" by ${blogObject.author} added!`,
+        `A new blog "${newBlog.title}" by ${newBlog.author} added!`,
         'success'
       )
       blogFormRef.current.toggleVisibility()
-    } catch (exception) {
-      if (exception.response) {
-        const { status, data } = exception.response
+    },
+    onError: (error) => {
+      console.error('Blog creation error:', error.response || error)
+      if (error.response) {
+        const { status, data } = error.response
         notify(`Error ${status}: ${data.error}`, 'error')
       } else {
         notify('An unexpected error occurred!', 'error')
       }
     }
+  })
+
+  const createBlog = (newBlog) => {
+    createBlogMutation.mutate(newBlog)
   }
 
-  const updateBlog = async (id, updatedBlog) => {
-    try {
-      const returnedBlog = await blogService.update(id, updatedBlog)
-      setBlogs(blogs.map((blog) => (blog.id !== id ? blog : returnedBlog)))
-      notify(`Blog "${returnedBlog.title}" updated successfully!`, 'success')
-    } catch (error) {
+  const updateBlogMutation = useMutation({
+    mutationFn: ({ id, updatedBlog }) => blogService.update(id, updatedBlog),
+    onSuccess: (updatedBlog) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      notify(`Blog "${updatedBlog.title}" updated successfully!`, 'success')
+    },
+    onError: (error) => {
       notify(`Error occurred while updating blog: ${error.message}`, 'error')
     }
+  })
+
+  const updateBlog = (id, blog) => {
+    updateBlogMutation.mutate({
+      id: id,
+      updatedBlog: { ...blog }
+    })
   }
 
-  const deleteBlog = async (id) => {
-    try {
-      await blogService.remove(id)
-      setBlogs(blogs.filter((blog) => blog.id !== id))
+  const deleteBlogMutation = useMutation({
+    mutationFn: ({ id }) => blogService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['blogs'])
       notify('Blog deleted successfully!', 'success')
-    } catch (exception) {
+    },
+    onError: (error) => {
       notify('Error occurred while deleting the blog!', 'error')
     }
+  })
+
+  const deleteBlog = async (id) => {
+    deleteBlogMutation.mutate({ id: id })
   }
+
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+    retry: 1
+  })
+
+  if (result.isLoading) return <div>Loading...</div>
+  if (result.isError) return <div>Error loading blogs</div>
+
+  const blogs = result.data
 
   return (
     <div>
