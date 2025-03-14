@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import Notification from './components/Notification'
-import loginService from './services/login'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import Users from './Views/Users'
 import {
   useNotificationValue,
   useNotificationDispatch
@@ -119,35 +120,50 @@ const App = () => {
   const blogs = result.data
 
   return (
-    <div>
-      <Notification message={notification?.message} type={notification?.type} />
-      {user === null ? (
-        <LoginForm />
-      ) : (
-        <div>
-          <h1>blogs</h1>
-          <p>
-            {user.name} logged in
-            <button onClick={handleLogout}>logout</button>
-          </p>
-          <Togglable buttonLabel="New blog" ref={blogFormRef}>
-            <BlogForm createBlog={createBlog} />
-          </Togglable>
-          {[...blogs]
-            // sort blogs in descending order based on the number of likes
-            .sort((a, b) => b.likes - a.likes)
-            .map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                updateBlog={updateBlog}
-                deleteBlog={deleteBlog}
-                user={user}
+    <Router>
+      <div>
+        <Notification
+          message={notification?.message}
+          type={notification?.type}
+        />
+        {user === null ? (
+          <LoginForm />
+        ) : (
+          <div>
+            <h1>Blogs</h1>
+            <p>
+              {user.name} logged in
+              <button onClick={handleLogout}>logout</button>
+            </p>
+            <Routes>
+              <Route path="/users" element={<Users />} />
+              <Route
+                path="/"
+                element={
+                  <div>
+                    <Togglable buttonLabel="New blog" ref={blogFormRef}>
+                      <BlogForm createBlog={createBlog} />
+                    </Togglable>
+                    {[...blogs]
+                      // sort blogs in descending order based on the number of likes
+                      .sort((a, b) => b.likes - a.likes)
+                      .map((blog) => (
+                        <Blog
+                          key={blog.id}
+                          blog={blog}
+                          updateBlog={updateBlog}
+                          deleteBlog={deleteBlog}
+                          user={user}
+                        />
+                      ))}
+                  </div>
+                }
               />
-            ))}
-        </div>
-      )}
-    </div>
+            </Routes>
+          </div>
+        )}
+      </div>
+    </Router>
   )
 }
 
