@@ -44,6 +44,19 @@ blogsRouter.post('/', middleware.tokenExtractor, middleware.userExtractor, async
   // are automatically passed to the error-handling middleware.
 })
 
+// Route to add new comment
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const { comment } = request.body
+
+  if (!comment) {
+    return response.status(400).json({ error: 'Comment cannot be empty!' })
+  }
+  const blog = await Blog.findById(request.params.id)
+  blog.comments = blog.comments.concat(comment)
+  await blog.save()
+  response.status(201).json(blog)
+})
+
 blogsRouter.delete('/:id', middleware.tokenExtractor, middleware.userExtractor, async (request, response) => {
   const user = request.user
 

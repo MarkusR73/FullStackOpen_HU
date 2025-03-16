@@ -45,6 +45,14 @@ const BlogView = ({ notify }) => {
         Likes: {blog.likes} <button onClick={handleLike}>Like</button>
       </p>
       <p>Added by {blog.user?.name || 'Unknown'}</p>
+      <h3>Comments</h3>
+      <ul>
+        {blog.comments && blog.comments.length > 0 ? (
+          blog.comments.map((comment, index) => <li key={index}>{comment}</li>)
+        ) : (
+          <p>No comments yet.</p>
+        )}
+      </ul>
     </div>
   )
 }
