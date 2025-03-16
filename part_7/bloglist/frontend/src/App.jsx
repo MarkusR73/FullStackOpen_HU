@@ -5,6 +5,7 @@ import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
+import NavBar from './components/NavBar'
 import Users from './views/Users'
 import UserView from './views/User'
 import BlogList from './views/BlogList'
@@ -91,6 +92,7 @@ const App = () => {
   return (
     <Router>
       <div>
+        <NavBar user={user} handleLogout={handleLogout} />
         <Notification
           message={notification?.message}
           type={notification?.type}
@@ -99,11 +101,7 @@ const App = () => {
           <LoginForm />
         ) : (
           <div>
-            <h1>Blogs</h1>
-            <p>
-              {user.name} logged in
-              <button onClick={handleLogout}>logout</button>
-            </p>
+            <h1>Blog app</h1>
             <Routes>
               <Route path="/users" element={<Users />} />
               <Route path="/users/:id" element={<UserView />} />
