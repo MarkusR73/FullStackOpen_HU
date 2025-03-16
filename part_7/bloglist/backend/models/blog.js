@@ -10,7 +10,7 @@ const blogSchema = new mongoose.Schema({
     ref: 'User'
   },
   likes: { type: Number, default: 0 },
-  comments: [String]  // Array of strings for anonymous comments
+  comments: { type: [String], default: [] }  // Array of strings for anonymous comments
 })
 
 // Transform _id to id
@@ -27,6 +27,7 @@ blogSchema.set('toJSON', {
       author: returnedObject.author,
       user: returnedObject.user,
       likes: returnedObject.likes,
+      comments: returnedObject.comments,
       id: returnedObject.id
     }
   }

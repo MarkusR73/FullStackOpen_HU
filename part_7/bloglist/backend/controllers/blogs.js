@@ -30,7 +30,8 @@ blogsRouter.post('/', middleware.tokenExtractor, middleware.userExtractor, async
     title: body.title,
     author: body.author,
     user: user.id,
-    likes: body.likes
+    likes: body.likes,
+    comments: body.comments
   })
 
   const savedBlog = await blog.save()
@@ -52,7 +53,7 @@ blogsRouter.post('/:id/comments', async (request, response) => {
     return response.status(400).json({ error: 'Comment cannot be empty!' })
   }
   const blog = await Blog.findById(request.params.id)
-  blog.comments = blog.comments.concat(comment)
+  blog.comments = blog.comments ? blog.comments.concat(comment) : [comment]
   await blog.save()
   response.status(201).json(blog)
 })
@@ -75,9 +76,9 @@ blogsRouter.delete('/:id', middleware.tokenExtractor, middleware.userExtractor, 
 
 
 blogsRouter.put('/:id', middleware.tokenExtractor, middleware.userExtractor, async (request, response) => {
-  const { title, author, url, likes, user } = request.body
+  const { title, author, url, likes, comments, user } = request.body
 
-  const updatedBlogData = { title, author, url, likes, user: user.id }
+  const updatedBlogData = { title, author, url, likes, comments: comments, user: user.id }
 
   const updatedBlog = await Blog
     .findByIdAndUpdate(

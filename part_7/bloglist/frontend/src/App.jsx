@@ -92,15 +92,15 @@ const App = () => {
   return (
     <Router>
       <div>
-        <NavBar user={user} handleLogout={handleLogout} />
-        <Notification
-          message={notification?.message}
-          type={notification?.type}
-        />
         {user === null ? (
           <LoginForm />
         ) : (
           <div>
+            <NavBar user={user} handleLogout={handleLogout} />
+            <Notification
+              message={notification?.message}
+              type={notification?.type}
+            />
             <h1>Blog app</h1>
             <Routes>
               <Route path="/users" element={<Users />} />

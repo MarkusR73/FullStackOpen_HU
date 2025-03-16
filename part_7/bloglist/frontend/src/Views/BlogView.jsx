@@ -1,10 +1,13 @@
+import { useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
+import Togglable from '../components/Togglable'
 
 const BlogView = ({ notify }) => {
   const { id } = useParams()
   const queryClient = useQueryClient()
+  const commentFormRef = useRef()
 
   const {
     data: blog,
@@ -26,12 +29,32 @@ const BlogView = ({ notify }) => {
     }
   })
 
-  if (isLoading) return <div>Loading blog...</div>
-  if (isError || !blog) return <div>Error loading blog</div>
-
   const handleLike = () => {
     likeMutation.mutate({ ...blog, likes: blog.likes + 1 })
   }
+
+  const commentMutation = useMutation({
+    mutationFn: ({ id, comment }) => blogService.addComment(id, comment),
+    onSuccess: ({ id }) => {
+      queryClient.invalidateQueries(['blog', id])
+      notify('Comment added successfully!', 'success')
+      commentFormRef.current.toggleVisibility()
+    },
+    onError: () => {
+      notify('Error adding comment.', 'error')
+    }
+  })
+
+  const handleAddComment = (event) => {
+    event.preventDefault()
+    const comment = event.target.comment.value
+
+    commentMutation.mutate({ id, comment })
+    event.target.comment.value = ''
+  }
+
+  if (isLoading) return <div>Loading blog...</div>
+  if (isError || !blog) return <div>Error loading blog</div>
 
   return (
     <div>
@@ -46,6 +69,12 @@ const BlogView = ({ notify }) => {
       </p>
       <p>Added by {blog.user?.name || 'Unknown'}</p>
       <h3>Comments</h3>
+      <Togglable buttonLabel="Add new comment" ref={commentFormRef}>
+        <form onSubmit={handleAddComment}>
+          <input name="comment" placeholder="Add a comment..." />
+          <button type="submit">Add Comment</button>
+        </form>
+      </Togglable>
       <ul>
         {blog.comments && blog.comments.length > 0 ? (
           blog.comments.map((comment, index) => <li key={index}>{comment}</li>)
