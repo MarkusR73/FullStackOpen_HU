@@ -1,0 +1,33 @@
+.blog-list {
+  padding: 20px;
+}
+
+.blog-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.blog-item a {
+  font-size: 1.2rem;
+  text-decoration: none;
+  color: #333;
+}
+
+.blog-item a:hover {
+  color: #007bff;
+}
+
+.blog-item button {
+  background-color: #ff6347;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.blog-item button:hover {
+  background-color: #d9534f;
+}

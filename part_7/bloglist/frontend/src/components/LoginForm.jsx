@@ -1,14 +1,20 @@
 import { useState } from 'react'
 import loginService from '../services/login'
 import blogService from '../services/blogs'
+import Notification from './Notification'
 import { useUserDispatch } from '../contexts/UserContext'
-import { useNotificationDispatch } from '../contexts/NotificationContext'
+import {
+  useNotificationDispatch,
+  useNotificationValue
+} from '../contexts/NotificationContext'
+import '../styles/LoginForm.css'
 
 const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   const userDispatch = useUserDispatch()
+  const notification = useNotificationValue()
   const notificationDispatch = useNotificationDispatch()
 
   const notify = (message, type) => {
@@ -32,12 +38,19 @@ const LoginForm = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      notify('Wrong username or password!', 'error')
+      console.error('Login error:', exception)
+      if (exception) {
+        const { status, data } = exception.response
+        notify(`Error ${status}: ${data.error}`, 'error')
+      } else {
+        notify('Wrong username or password!', 'error')
+      }
     }
   }
 
   return (
-    <div>
+    <div className="login-form">
+      <Notification message={notification?.message} type={notification?.type} />
       <h1>log in to application</h1>
       <form onSubmit={handleLogin}>
         <div>

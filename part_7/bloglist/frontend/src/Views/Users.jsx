@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import userService from '../services/users'
+import '../styles/Users.css'
 import { Link } from 'react-router-dom'
 
 const Users = () => {
@@ -18,7 +19,7 @@ const Users = () => {
   const sortedUsers = [...users].sort((a, b) => b.blogs.length - a.blogs.length)
 
   return (
-    <div>
+    <div className="users-list">
       <h2>Users</h2>
       <table>
         <thead>

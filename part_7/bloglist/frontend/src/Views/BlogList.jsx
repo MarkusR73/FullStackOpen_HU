@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
+import '../styles/BlogList.css'
 
 const BlogList = ({ blogs, notify }) => {
   const queryClient = useQueryClient()
@@ -27,18 +28,13 @@ const BlogList = ({ blogs, notify }) => {
   }
 
   return (
-    <div>
+    <div className="blog-list">
       {blogs.map((blog) => (
-        <div key={blog.id} style={{ marginBottom: '10px' }}>
+        <div className="blog-item" key={blog.id}>
           <Link to={`/blogs/${blog.id}`}>
             {blog.title} - {blog.author}
           </Link>
-          <button
-            onClick={() => handleDelete(blog.id)}
-            style={{ marginLeft: '10px' }}
-          >
-            Delete
-          </button>
+          <button onClick={() => handleDelete(blog.id)}>Delete</button>
         </div>
       ))}
     </div>

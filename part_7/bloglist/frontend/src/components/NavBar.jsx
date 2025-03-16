@@ -1,41 +1,21 @@
 import { Link } from 'react-router-dom'
+import '../styles/navbar.css'
 
 const NavBar = ({ user, handleLogout }) => {
   return (
-    <nav style={navStyle}>
-      <Link to="/" style={linkStyle}>
+    <nav className="navbar">
+      <Link to="/" className="nav-link">
         Blogs
       </Link>
-      <Link to="/users" style={linkStyle}>
+      <Link to="/users" className="nav-link">
         Users
       </Link>
       <span>{user.name} logged in</span>
-      <button onClick={handleLogout} style={buttonStyle}>
+      <button onClick={handleLogout} className="logout-btn">
         Logout
       </button>
     </nav>
   )
-}
-
-const navStyle = {
-  display: 'flex',
-  gap: '10px',
-  alignItems: 'center',
-  padding: '10px',
-  backgroundColor: '#f4f4f4',
-  borderBottom: '1px solid #ccc'
-}
-
-const linkStyle = {
-  textDecoration: 'none',
-  color: 'blue',
-  fontWeight: 'bold'
-}
-
-const buttonStyle = {
-  marginLeft: '10px',
-  padding: '5px 10px',
-  cursor: 'pointer'
 }
 
 export default NavBar

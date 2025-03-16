@@ -1,0 +1,32 @@
+.users-list {
+  padding: 20px;
+}
+
+.users-list h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.users-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.users-list th, .users-list td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.users-list th {
+  background-color: #f8f9fa;
+}
+
+.users-list td a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.users-list td a:hover {
+  text-decoration: underline;
+}

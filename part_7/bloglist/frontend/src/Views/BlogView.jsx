@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
 import Togglable from '../components/Togglable'
+import '../styles/BlogView.css'
 
 const BlogView = ({ notify }) => {
   const { id } = useParams()
@@ -57,7 +58,7 @@ const BlogView = ({ notify }) => {
   if (isError || !blog) return <div>Error loading blog</div>
 
   return (
-    <div>
+    <div className="blog-view">
       <h2>
         {blog.title} - {blog.author}
       </h2>

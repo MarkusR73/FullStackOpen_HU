@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import userService from '../services/users'
-import blogService from '../services/blogs'
+import '../styles/User.css'
 
 const UserView = () => {
   const { id } = useParams()
@@ -19,7 +19,7 @@ const UserView = () => {
   if (userError) return <div>Error loading data</div>
 
   return (
-    <div>
+    <div className="user-view">
       <h2>{user.name}</h2>
       <h3>Added blogs</h3>
       <ul>
