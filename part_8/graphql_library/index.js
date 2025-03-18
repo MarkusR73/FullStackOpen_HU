@@ -1,5 +1,6 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
+const { v1: uuid } = require('uuid')
 
 let authors = [
   {
@@ -18,28 +19,14 @@ let authors = [
     born: 1821
   },
   { 
-    name: 'Joshua Kerievsky', // birthyear not known
+    name: 'Joshua Kerievsky', 
     id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
   },
   { 
-    name: 'Sandi Metz', // birthyear not known
+    name: 'Sandi Metz', 
     id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
   },
 ]
-
-/*
- * Suomi:
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
- *
- * English:
- * It might make more sense to associate a book with its author by storing the author's id in the context of the book instead of the author's name
- * However, for simplicity, we will store the author's name in connection with the book
- *
- * Spanish:
- * Podría tener más sentido asociar un libro con su autor almacenando la id del autor en el contexto del libro en lugar del nombre del autor
- * Sin embargo, por simplicidad, almacenaremos el nombre del autor en conexión con el libro
-*/
 
 let books = [
   {
@@ -104,6 +91,8 @@ const typeDefs = `
 
   type Author {
     name: String!
+    id: ID!
+    born: Int
     bookCount: Int!
   }
   
@@ -112,6 +101,15 @@ const typeDefs = `
     authorCount: Int!
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
+  }
+
+  type Mutation {
+    addBook(
+      title: String!
+      published: Int!
+      author: String!
+      genres: [String!]!
+    ): Book
   }
 `
 
@@ -132,9 +130,26 @@ const resolvers = {
     allAuthors: () => {
       return authors.map((author) => ({
         name: author.name,
+        born: author.born,
         bookCount: books.filter((book) => book.author === author.name).length,
       }))
-    },
+    }
+  },
+  Mutation: {
+    addBook: (root, args) => {
+      let author = authors.find((a) => a.name === args.author)
+      if (!author) {
+        author = {
+          name: args.author,
+          id: uuid(),  
+          born: null,   
+        }
+        authors = authors.concat(author)
+      }
+      const book = { ...args, id: uuid() }
+      books = books.concat(book)
+      return book
+    }
   }
 }
 
