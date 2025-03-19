@@ -4,7 +4,7 @@ import Books from "./components/Books"
 import NewBook from "./components/NewBook"
 import { gql, useQuery } from '@apollo/client'
 
-const ALL_BOOKS = gql`
+export const ALL_BOOKS = gql`
 query {
   allBooks {
     title
@@ -13,7 +13,7 @@ query {
   }
 }
 `
-const ALL_AUTHORS = gql`
+export const ALL_AUTHORS = gql`
   query {
     allAuthors {
     name
