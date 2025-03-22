@@ -1,3 +1,4 @@
+const { GraphQLError } = require('graphql')
 const Book = require('./models/book')
 const Author = require('./models/author')
 const { ApolloServer } = require('@apollo/server')
@@ -63,14 +64,22 @@ const resolvers = {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      let filteredBooks = await Book.find({}).populate('author')
-      if (args.genre) {
-        filteredBooks = filteredBooks.filter((book) => book.genres.includes(args.genre))
+      let filter = {}
+
+      if (args && args.genre) filter.genres = { $in: args.genre }
+      
+      if (args && args.author) {
+        const foundAuthor = await Author.findOne({ name: args.author })
+        if (foundAuthor) {
+          filter.author = foundAuthor._id
+        }
+        else {
+          return []
+        }
       }
-      if (args.author) {
-        filteredBooks = filteredBooks.filter((book) => book.author.name === args.author)
-      }
-      return filteredBooks
+
+      const books = await Book.find(filter).populate('author')
+      return books
     },
     allAuthors: async () => {
       const authors = await Author.find({})
@@ -86,10 +95,32 @@ const resolvers = {
       let author = await Author.findOne({ name: args.author })
       if (!author) {
         author = new Author({ name: args.author })
-        await author.save()
+        try {
+          await author.save()
+        }
+        catch (error) {
+          throw new GraphQLError('Inserted author name should be at least 4 characters long!', {
+            extensions: {
+              code: 'BAD_USER_INPUT',
+              invalidArgs: args.author,
+              error
+            }
+          })
+        }
       }
       const book = new Book({ ...args, author: author._id })
-      await book.save()
+      try {
+        await book.save()
+      }
+      catch (error) {
+        throw new GraphQLError('Inserted book title should be at least 5 characters long!', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+            error
+          }
+        })
+      }
       return book.populate('author')
     },
     editAuthor: async (root, args) => {
