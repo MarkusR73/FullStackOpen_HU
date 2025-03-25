@@ -1,4 +1,8 @@
+import { useState } from "react"
+
 const Books = (props) => {
+  const [selectedGenre, setSelectedGenre] = useState("")
+
   if (!props.show) {
     return null
   }
@@ -12,10 +16,23 @@ const Books = (props) => {
 
   const books = props.data?.allBooks || []
 
+  const allGenres = [...new Set(books.flatMap(book => book.genres))]
+
+  const filteredBooks = selectedGenre
+    ? books.filter(book => book.genres?.includes(selectedGenre))
+    : books
+
   return (
     <div>
       <h2>books</h2>
-
+      <select value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
+				<option value="">All genres</option>
+				{allGenres.map((genre) => (
+					<option key={genre} value={genre}>
+						{genre}
+					</option>
+				))}
+			</select>
       <table>
         <tbody>
           <tr>
@@ -23,7 +40,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.map((a) => (
+          {filteredBooks.map((a) => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>

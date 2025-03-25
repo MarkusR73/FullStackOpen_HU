@@ -9,6 +9,7 @@ query {
       name
     }
     published
+    genres
   }
 }
 `
