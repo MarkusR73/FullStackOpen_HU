@@ -26,8 +26,8 @@ mongoose.connect(MONGODB_URI)
 const typeDefs = `
   type Book {
       title: String!
-      published: Int!
       author: Author!
+      published: Int!
       genres: [String!]!
       id: ID!
   }
@@ -49,7 +49,6 @@ const typeDefs = `
     value: String!
   }
 
-  
   type Query {
     bookCount: Int!
     authorCount: Int!
@@ -127,7 +126,6 @@ const resolvers = {
           }
         })
       }
-
       let author = await Author.findOne({ name: args.author })
       if (!author) {
         author = new Author({ name: args.author })
@@ -229,6 +227,14 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  plugins: [
+    {
+      requestDidStart(requestContext) {
+        console.log('Incoming query: ', requestContext.request.query)
+        console.log('Variables: ', requestContext.request.variables)
+      }
+    }
+  ]
 })
 
 startStandaloneServer(server, {
@@ -241,6 +247,7 @@ startStandaloneServer(server, {
       )
       const currentUser = await User
         .findById(decodedToken.id)
+      console.log('Current user:', currentUser)
       return { currentUser }
     }
   },

@@ -21,26 +21,32 @@ const NewBook = (props) => {
 
   const submit = async (event) => {
     event.preventDefault()
-
-    createBook({  
-      variables: {
-        title,
-        published: Number(published),
-        author,
-        genres
-      }
-    })
-
-    setTitle('')
-    setPublished('')
-    setAuthor('')
-    setGenres([])
-    setGenre('')
+    try {
+      await createBook({  
+        variables: {
+          title: title,
+          author: author,
+          published: parseInt(published),
+          genres: genres
+        }
+      })
+      setTitle('')
+      setPublished('')
+      setAuthor('')
+      setGenres([])
+      setGenre('')
+    }
+    catch (error) {
+      console.error('Error creating book:', error)
+      error.graphQLErrors?.forEach(({ message }) => props.setError(message))
+    }
   }
 
   const addGenre = () => {
-    setGenres(genres.concat(genre))
-    setGenre('')
+    if (genre.trim()) {
+      setGenres(genres.concat(genre))
+      setGenre('')
+    }
   }
 
   return (
@@ -69,13 +75,13 @@ const NewBook = (props) => {
           />
         </div>
         <div>
+          <button onClick={addGenre} type="button">
+            add genre
+          </button>
           <input
             value={genre}
             onChange={({ target }) => setGenre(target.value)}
           />
-          <button onClick={addGenre} type="button">
-            add genre
-          </button>
         </div>
         <div>genres: {genres.join(' ')}</div>
         <button type="submit">create book</button>
