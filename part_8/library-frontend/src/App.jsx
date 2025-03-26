@@ -6,7 +6,7 @@ import LoginForm from "./components/LoginForm"
 import Notify from './components/Notify'
 import RecommendedBooks from "./components/RecommendedBooks"
 import { useQuery, useApolloClient } from '@apollo/client'
-import { ALL_BOOKS, ALL_AUTHORS } from "./queries"
+import { ALL_AUTHORS } from "./queries"
 
 const App = () => {
   const [page, setPage] = useState("authors")
@@ -14,7 +14,6 @@ const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const client = useApolloClient()
 
-  const { data: bookData, loading: bookLoading, error: bookError } = useQuery(ALL_BOOKS)
   const { data: authorData, loading: authorLoading, error: authorError } = useQuery(ALL_AUTHORS)
 
   const notify = (message) => {
@@ -46,13 +45,13 @@ const App = () => {
 
       <Authors show={page === "authors"} data={authorData} loading={authorLoading} error={authorError} token={token} />
 
-      <Books show={page === "books"}  data={bookData} loading={bookLoading} error={bookError} />
+      <Books show={page === "books"} />
 
       <NewBook show={page === "add"} setError={notify} />
 
       <LoginForm show={page === "login"} setToken={setToken} setError={notify} setPage={setPage} />
 
-      <RecommendedBooks show={page === "recommend"} setError={notify} books={bookData} loading={bookLoading} error={bookError} />
+      <RecommendedBooks show={page === "recommend"} setError={notify} />
     </div>
   )
 }

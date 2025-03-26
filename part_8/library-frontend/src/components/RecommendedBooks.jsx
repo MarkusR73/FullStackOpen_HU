@@ -1,26 +1,27 @@
 import { useQuery } from "@apollo/client"
-import { GET_USER } from "../queries"
+import { GET_USER, ALL_BOOKS } from "../queries"
 
 const RecommendedBooks = (props) => {
-	const { loading, error, data } = useQuery(GET_USER)
+	const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USER, {
+		skip: !props.show 
+	})
 
-	if (!props.show) {
-    return null
-  }
-  if (props.loading) {
-		return <p>Loading books...</p>
-	}
+	const favoriteGenre = userData?.me?.favoriteGenre
 
-	if (props.error) {
-		return <p>Error fetching books: {props.error.message}</p>
-	}
+	const { data, loading, error } = useQuery(ALL_BOOKS, {
+		variables: { genre: favoriteGenre },
+		skip: !favoriteGenre, 
+		fetchPolicy: "cache-and-network"
+	})
 
-	if (loading) return <p>Loading user info...</p>
-	if (error) return <p>Error fetching user info: {error.message}</p>
+	if (!props.show) return null
 
-	const favoriteGenre = data?.me?.favoriteGenre
+  if (userLoading || loading) return <p>Loading...</p>
 
-	const recommendedBooks = props.books?.allBooks?.filter(book => book.genres.includes(favoriteGenre))
+	if (userError) return <p>Error fetching user info: {userError.message}</p>
+	if (error) return <p>Error fetching books: {error.message}</p>
+
+	const recommendedBooks = data?.allBooks || []
 
 	return (
 		<div>

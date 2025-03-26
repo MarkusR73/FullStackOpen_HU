@@ -1,26 +1,44 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useQuery } from "@apollo/client"
+import { ALL_BOOKS } from "../queries"
 
 const Books = (props) => {
   const [selectedGenre, setSelectedGenre] = useState("")
+  const [allGenres, setAllGenres] = useState([])
 
-  if (!props.show) {
-    return null
-  }
-  if (props.loading) {
-		return <p>Loading books...</p>
-	}
+  // Fetch all books when entering the books view (without filtering)
+  const { data: allBooksData, loading: allBooksLoading, error: allBooksError, refetch: refetchAllBooks } = useQuery(ALL_BOOKS, {
+    fetchPolicy: "cache-and-network",
+    skip: !props.show 
+  })
 
-	if (props.error) {
-		return <p>Error fetching books: {props.error.message}</p>
-	}
+  // Fetch books based on selected genre
+  const { data, loading, error, refetch } = useQuery(ALL_BOOKS, {
+    variables: { genre: selectedGenre },
+    fetchPolicy: "cache-and-network",
+  })
 
-  const books = props.data?.allBooks || []
+  // Set allGenres only when entering the books view
+  useEffect(() => {
+    if (allBooksData) {
+      const genres = [...new Set(allBooksData.allBooks.flatMap(book => book.genres))]
+      setAllGenres(genres)
+    }
+  }, [allBooksData])
 
-  const allGenres = [...new Set(books.flatMap(book => book.genres))]
+  // Refetch books when genre changes and when entering the view
+  useEffect(() => {
+		refetch({ genre: selectedGenre })
+	}, [selectedGenre, props.show, refetch])
 
-  const filteredBooks = selectedGenre
-    ? books.filter(book => book.genres?.includes(selectedGenre))
-    : books
+
+  if (!props.show) return null
+
+  if (loading || allBooksLoading) return <p>Loading books...</p>
+
+  if (error || allBooksError) return <p>Error fetching books: {error?.message || allBooksError?.message}</p>
+
+  const books = data?.allBooks || []
 
   return (
     <div>
@@ -40,7 +58,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {filteredBooks.map((a) => (
+          {books.map((a) => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
