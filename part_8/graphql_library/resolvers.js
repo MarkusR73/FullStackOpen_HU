@@ -80,6 +80,7 @@ const resolvers = {
         })
       }
       pubsub.publish('BOOK_ADDED', { bookAdded: book })
+      console.log("BOOK_ADDED event published:", book)
       return book.populate('author')
     },
     editAuthor: async (root, args, context) => {
@@ -149,12 +150,10 @@ const resolvers = {
   },
   Subscription: {
     bookAdded: {
-      subscribe: withFilter(
-        () => pubsub.asyncIterableIterator('BOOK_ADDED'),
-        (payload, variables) => {
-          return true
-        }
-      )
+      subscribe: () => pubsub.asyncIterableIterator('BOOK_ADDED'),
+      resolve: async (payload) => {
+        return Book.findById(payload.bookAdded._id).populate('author')
+      }
     }
   }
 }

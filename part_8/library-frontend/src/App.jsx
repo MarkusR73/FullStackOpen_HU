@@ -5,13 +5,31 @@ import NewBook from "./components/NewBook"
 import LoginForm from "./components/LoginForm"
 import Notify from './components/Notify'
 import RecommendedBooks from "./components/RecommendedBooks"
-import { useQuery, useApolloClient } from '@apollo/client'
-import { ALL_AUTHORS } from "./queries"
+import { useQuery, useApolloClient, useSubscription } from '@apollo/client'
+import { ALL_AUTHORS, ALL_BOOKS, BOOK_ADDED } from "./queries"
+
+export const updateCache = (cache, query, addedBook) => {
+  // helper that is used to eliminate saving same book twice
+  const uniqByName = (a) => {
+    let seen = new Set()
+    return a.filter((item) => {
+      let k = item.name
+      return seen.has(k) ? false : seen.add(k)
+    })
+  }
+
+  cache.updateQuery(query, ({ allBooks }) => {
+    return {
+      allBooks: uniqByName(allBooks.concat(addedBook)),
+    }
+  })
+}
 
 const App = () => {
   const [page, setPage] = useState("authors")
   const [token, setToken] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [allGenres, setAllGenres] = useState([])
   const client = useApolloClient()
 
   const { data: authorData, loading: authorLoading, error: authorError } = useQuery(ALL_AUTHORS)
@@ -30,6 +48,18 @@ const App = () => {
     client.resetStore()
   }
 
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data, client }) => {
+      const addedBook = data.data.bookAdded
+      window.alert(`${addedBook.title} by ${addedBook.author.name} added!`)
+      updateCache(client.cache, { query: ALL_BOOKS }, addedBook)
+      setAllGenres(prevGenres => {
+        const updatedGenres = new Set([...prevGenres, ...addedBook.genres])
+        return Array.from(updatedGenres)
+      })
+    }
+  })
+
 
   return (
     <div>
@@ -45,7 +75,7 @@ const App = () => {
 
       <Authors show={page === "authors"} data={authorData} loading={authorLoading} error={authorError} token={token} />
 
-      <Books show={page === "books"} />
+      <Books show={page === "books"} allGenres={allGenres} setAllGenres={setAllGenres}/>
 
       <NewBook show={page === "add"} setError={notify} />
 

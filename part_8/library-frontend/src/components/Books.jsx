@@ -4,7 +4,6 @@ import { ALL_BOOKS } from "../queries"
 
 const Books = (props) => {
   const [selectedGenre, setSelectedGenre] = useState("")
-  const [allGenres, setAllGenres] = useState([])
 
   // Fetch all books when entering the books view (without filtering)
   const { data: allBooksData, loading: allBooksLoading, error: allBooksError, refetch: refetchAllBooks } = useQuery(ALL_BOOKS, {
@@ -22,7 +21,10 @@ const Books = (props) => {
   useEffect(() => {
     if (allBooksData) {
       const genres = [...new Set(allBooksData.allBooks.flatMap(book => book.genres))]
-      setAllGenres(genres)
+      props.setAllGenres(prevGenres => {
+        const newGenres = new Set([...prevGenres, ...genres])
+        return Array.from(newGenres)
+      })
     }
   }, [allBooksData])
 
@@ -30,7 +32,6 @@ const Books = (props) => {
   useEffect(() => {
 		refetch({ genre: selectedGenre })
 	}, [selectedGenre, props.show, refetch])
-
 
   if (!props.show) return null
 
@@ -45,7 +46,7 @@ const Books = (props) => {
       <h2>books</h2>
       <select value={selectedGenre} onChange={e => setSelectedGenre(e.target.value)}>
 				<option value="">All genres</option>
-				{allGenres.map((genre) => (
+				{props.allGenres.map((genre) => (
 					<option key={genre} value={genre}>
 						{genre}
 					</option>
