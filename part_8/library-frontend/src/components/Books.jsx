@@ -31,7 +31,7 @@ const Books = (props) => {
   // Refetch books when genre changes and when entering the view
   useEffect(() => {
 		refetch({ genre: selectedGenre })
-	}, [selectedGenre, props.show, refetch])
+	}, [selectedGenre, allBooksData, props.show, refetch])
 
   if (!props.show) return null
 

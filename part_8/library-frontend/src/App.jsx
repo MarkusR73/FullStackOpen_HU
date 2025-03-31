@@ -9,25 +9,15 @@ import { useQuery, useApolloClient, useSubscription } from '@apollo/client'
 import { ALL_AUTHORS, ALL_BOOKS, BOOK_ADDED } from "./queries"
 
 export const updateCache = (cache, query, addedBook) => {
-  // helper that is used to eliminate saving same book twice
-  const uniqByName = (a) => {
-    let seen = new Set()
-    return a.filter((item) => {
-      let k = item.name
-      return seen.has(k) ? false : seen.add(k)
-    })
-  }
-
-  cache.updateQuery(query, ({ allBooks }) => {
-    return {
-      allBooks: uniqByName(allBooks.concat(addedBook)),
-    }
+  cache.updateQuery(query, ( data ) => {
+    if (!data || !data.allBooks) return { allBooks: [addedBook] }
+    return { allBooks: [...data.allBooks, addedBook] }
   })
 }
 
 const App = () => {
   const [page, setPage] = useState("authors")
-  const [token, setToken] = useState(null)
+  const [token, setToken] = useState(() => localStorage.getItem("library-user-token"))
   const [errorMessage, setErrorMessage] = useState(null)
   const [allGenres, setAllGenres] = useState([])
   const client = useApolloClient()
