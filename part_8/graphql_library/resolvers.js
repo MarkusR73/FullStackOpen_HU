@@ -30,10 +30,18 @@ const resolvers = {
     },
     allAuthors: async () => {
       const authors = await Author.find({})
-      return authors.map(async(author) => ({
+      const books = await Book.find({})
+
+      // Create a mapping of authorId -> book count
+      const bookCounts = books.reduce((acc, book) => {
+        acc[book.author.toString()] = (acc[book.author.toString()] || 0) + 1
+        return acc
+	    }, {})
+      // Attach book count to each author
+      return authors.map(author => ({
         name: author.name,
         born: author.born,
-        bookCount: await Book.collection.countDocuments({ author: author._id})
+        bookCount: bookCounts[author._id.toString()] || 0
       }))
     },
     me: (root, args, context) => {

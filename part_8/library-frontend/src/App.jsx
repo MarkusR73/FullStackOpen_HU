@@ -43,6 +43,18 @@ const App = () => {
       const addedBook = data.data.bookAdded
       window.alert(`${addedBook.title} by ${addedBook.author.name} added!`)
       updateCache(client.cache, { query: ALL_BOOKS }, addedBook)
+
+      client.cache.updateQuery({ query: ALL_AUTHORS }, (data) => {
+        if (!data || !data.allAuthors) return data
+          return {
+            allAuthors: data.allAuthors.map(author =>
+              author.name === addedBook.author.name
+              ? { ...author, bookCount: author.bookCount + 1 }
+              : author
+          )
+        }
+      })
+
       setAllGenres(prevGenres => {
         const updatedGenres = new Set([...prevGenres, ...addedBook.genres])
         return Array.from(updatedGenres)
