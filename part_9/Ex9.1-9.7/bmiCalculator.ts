@@ -53,9 +53,9 @@ try {
 }
 catch (error: unknown) {
   let errorMessage = "Something bad happened.";
-		if (error instanceof Error) {
-			errorMessage += " Error: " + error.message;
-		}
-		console.log(errorMessage);
-		process.exit(1);
+    if (error instanceof Error) {
+      errorMessage += " Error: " + error.message;
+    }
+    console.log(errorMessage);
+    process.exit(1);
 }
