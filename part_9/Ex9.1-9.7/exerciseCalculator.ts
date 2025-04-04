@@ -8,6 +8,21 @@ interface ExerciseResult {
   average: number;
 }
 
+const parseExerciseArguments = (args: string[]): { target: number; dailyHours: number[] } => {
+  if (args.length < 4) {
+    throw new Error("Usage: npm run calculateExercises <target> <day1> <day2> ... <dayN>");
+  }
+
+  const target = Number(args[2]);
+  const dailyHours = args.slice(3).map(Number);
+
+  if (isNaN(target) || dailyHours.some(isNaN)) {
+    throw new Error("Provided values must be numbers.");
+  }
+
+  return { target, dailyHours };
+};
+
 const calculateExercises = (dailyHours: number[], target: number): ExerciseResult => {
   const periodLength = dailyHours.length;
   const trainingDays = dailyHours.filter(h => h > 0).length;
@@ -39,4 +54,14 @@ const calculateExercises = (dailyHours: number[], target: number): ExerciseResul
   };
 };
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+try {
+  const { target, dailyHours } = parseExerciseArguments(process.argv);
+  console.log(calculateExercises(dailyHours, target));
+} catch (error: unknown) {
+  let errorMessage = "Something bad happened.";
+  if (error instanceof Error) {
+    errorMessage += " Error: " + error.message;
+  }
+  console.log(errorMessage);
+  process.exit(1);
+}
