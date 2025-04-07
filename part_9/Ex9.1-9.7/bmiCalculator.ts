@@ -3,6 +3,12 @@ interface BmiValues {
   weight: number;
 }
 
+interface BmiResult {
+  weight: number;
+  height: number;
+  bmi: string;
+}
+
 export const parseBmiArguments = (args: string[]): BmiValues => {
   if (args.length !== 4) {
     throw new Error("Usage: npm run calculateBmi <heightCm> <weightKg>");
@@ -18,7 +24,7 @@ export const parseBmiArguments = (args: string[]): BmiValues => {
   return { height, weight };
 };
 
-const calculateBmi = (heightCm: number, weightKg: number): string => {
+export const calculateBmi = (heightCm: number, weightKg: number): BmiResult => {
   if (heightCm <= 0) {
     throw new Error("The given height must be a positive number!");
   }
@@ -26,36 +32,45 @@ const calculateBmi = (heightCm: number, weightKg: number): string => {
     throw new Error("The given weight must be a positive number!");
   }
   const heightM = heightCm / 100;
-  const bmi = Math.round((weightKg / (heightM ** 2)) * 10) / 10;  // Round to 1 decimal place
+  const bmiValue = Math.round((weightKg / (heightM ** 2)) * 10) / 10;  // Round to 1 decimal place
 
-  if (bmi < 16.0) {
-    return "Underweight (Severe thinness)";
-  } else if (bmi < 17.0) {
-    return "Underweight (Moderate thinness)";
-  } else if (bmi < 18.5) {
-    return "Underweight (Mild thinness)";
-  } else if (bmi < 25.0) {
-    return "Normal range";
-  } else if (bmi < 30.0) {
-    return "Overweight (Pre-obese)";
-  } else if (bmi < 35.0) {
-    return "Obese (Class I)";
-  } else if (bmi < 40.0) {
-    return "Obese (Class II)";
+  let bmiCategory: string;
+  if (bmiValue < 16.0) {
+    bmiCategory = "Underweight (Severe thinness)";
+  } else if (bmiValue < 17.0) {
+    bmiCategory = "Underweight (Moderate thinness)";
+  } else if (bmiValue < 18.5) {
+    bmiCategory = "Underweight (Mild thinness)";
+  } else if (bmiValue < 25.0) {
+    bmiCategory = "Normal range";
+  } else if (bmiValue < 30.0) {
+    bmiCategory = "Overweight (Pre-obese)";
+  } else if (bmiValue < 35.0) {
+    bmiCategory = "Obese (Class I)";
+  } else if (bmiValue < 40.0) {
+    bmiCategory = "Obese (Class II)";
   } else {
-    return "Obese (Class III)";
+    bmiCategory = "Obese (Class III)";
   }
+  
+  return {
+    weight: weightKg,
+    height: heightCm,
+    bmi: bmiCategory,
+  };
 }
 
-try {
-  const { height, weight } = parseBmiArguments(process.argv);
-  console.log(calculateBmi(height, weight));
-}
-catch (error: unknown) {
-  let errorMessage = "Something bad happened.";
-    if (error instanceof Error) {
-      errorMessage += " Error: " + error.message;
-    }
-    console.log(errorMessage);
-    process.exit(1);
+if (require.main === module) {
+  try {
+    const { height, weight } = parseBmiArguments(process.argv);
+    console.log(calculateBmi(height, weight));
+  }
+  catch (error: unknown) {
+    let errorMessage = "Something bad happened.";
+      if (error instanceof Error) {
+        errorMessage += " Error: " + error.message;
+      }
+      console.log(errorMessage);
+      process.exit(1);
+  }
 }
