@@ -8,8 +8,8 @@ app.get('/hello', (_req, res) => {
 });
 
 app.get('/bmi', (req, res) => {
-  const height = Number(req.query.height?.toString());
-  const weight = Number(req.query.weight?.toString());
+  const height = Number(req.query.height as string);
+  const weight = Number(req.query.weight as string);
   if (isNaN(height) || isNaN(weight)) {
     res.status(400).send({ error: 'malformatted parameters' });
   }

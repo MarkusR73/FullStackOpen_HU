@@ -58,7 +58,7 @@ export const calculateBmi = (heightCm: number, weightKg: number): BmiResult => {
     height: heightCm,
     bmi: bmiCategory,
   };
-}
+};
 
 if (require.main === module) {
   try {
