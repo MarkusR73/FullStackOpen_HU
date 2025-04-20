@@ -1,7 +1,11 @@
 import express from 'express';
 import { calculateBmi } from './bmiCalculator';
+import { calculateExercises } from './exerciseCalculator';
 
 const app = express();
+
+// Add this middleware to parse JSON request bodies
+app.use(express.json());
 
 app.get('/hello', (_req, res) => {
   res.send('Hello Full Stack!');
@@ -13,11 +17,41 @@ app.get('/bmi', (req, res) => {
   if (isNaN(height) || isNaN(weight)) {
     res.status(400).send({ error: 'malformatted parameters' });
   }
-  try {
-    const result = calculateBmi(height, weight);
-    res.json(result);
-  } catch (error: unknown) {
-    res.status(400).json({ error: (error as Error).message });
+  else {
+    try {
+      const result = calculateBmi(height, weight);
+      res.json(result);
+    } catch (error: unknown) {
+      res.status(400).json({ error: (error as Error).message });
+    }
+  }
+});
+
+app.post('/exercises', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { daily_exercises, target }: any = req.body;
+
+  if (!daily_exercises || target === undefined) {
+    res.status(400).json({ error: 'parameters missing' });
+  }
+  else if (
+    !Array.isArray(daily_exercises) ||
+    daily_exercises.some((hours) => isNaN(Number(hours))) ||
+    isNaN(Number(target))
+  ) {
+    res.status(400).json({ error: 'malformatted parameters' });
+  }
+  else {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    try {
+      const result = calculateExercises(
+        daily_exercises.map((hours: any) => Number(hours)),
+        Number(target)
+      );
+      res.json(result);
+    } catch (error: unknown) {
+      res.status(400).json({ error: (error as Error).message });
+    }
   }
 });
 
