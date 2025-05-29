@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { DiaryEntry } from './types';
 import { getAllDiaryEntries, createDiaryEntry } from './services/diaryService';
+import axios from 'axios';
 import './App.css'
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
   const [weather, setWeather] = useState('');
   const [comment, setComment] = useState('');
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
+  const [error, setError] = useState<string | null>(null);
   
   useEffect(() => {
     getAllDiaryEntries().then((data: DiaryEntry[]) => {
@@ -19,6 +21,7 @@ function App() {
 
   const diaryEntryCreation = async (event: React.SyntheticEvent) => {
     event.preventDefault();
+    setError(null);
     try {
       const newEntry = await createDiaryEntry({ date, visibility, weather, comment });
       setDiaryEntries(diaryEntries.concat(newEntry));
@@ -26,8 +29,12 @@ function App() {
       setVisibility('');
       setWeather('');
       setComment('');
-    } catch (error) {
-      // Optionally handle error here
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response) {
+        setError(error.response.data ? String(error.response.data) : 'Unknown error');
+      } else {
+        setError('An unexpected error occurred');
+      }
       console.error(error);
     }
   };
@@ -35,6 +42,7 @@ function App() {
   return (
     <div>
       <h1>Add new entry</h1>
+      {error && <div style={{ color: 'red' }}>{error}</div>}
       <form onSubmit={diaryEntryCreation}>
         <div>
           <label>Date: </label>
