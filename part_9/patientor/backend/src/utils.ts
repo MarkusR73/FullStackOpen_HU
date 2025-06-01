@@ -8,9 +8,3 @@ export const NewPatientSchema = z.object ({
     dateOfBirth: z.string().date(),
     gender: z.nativeEnum(Gender),
 });
-
-export const RawPatientSchema = NewPatientSchema.extend({
-  gender: z.nativeEnum(Gender),
-  entries: z.array(z.unknown()).optional(),
-  id: z.string()
-});
