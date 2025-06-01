@@ -32,6 +32,27 @@ const PatientDetailsPage = () => {
       <h2>{patient.name} {getGenderIcon(patient.gender)}</h2>
       <div>SSN: {patient.ssn}</div>
       <div>Occupation: {patient.occupation}</div>
+      <h3>Entries</h3>
+      <ul>
+        {patient.entries && patient.entries.length > 0 ? (
+          patient.entries.map((entry) => (
+            <li key={entry.id}>
+              <div>
+                <strong>{entry.date}</strong> - {entry.description}
+              </div>
+              {entry.diagnosisCodes && entry.diagnosisCodes.length > 0 && (
+                <ul>
+                  {entry.diagnosisCodes.map((code) => (
+                    <li key={code}>{code}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))
+        ) : (
+          <div>No entries found for this patient.</div>
+        )}
+      </ul>
     </div>
   );
 };
