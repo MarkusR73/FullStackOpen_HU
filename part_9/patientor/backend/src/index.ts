@@ -18,6 +18,7 @@ app.get('/api/ping', (_req, res) => {
 
 app.use('/api/diagnoses', diagnosesRouter);
 app.use('/api/patients', patientRouter);
+app.use('api/patient/:id', patientRouter);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

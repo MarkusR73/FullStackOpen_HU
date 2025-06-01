@@ -1,6 +1,4 @@
-import { Patient } from "../backend/src/types";
-
-const patientEntries: Patient[] = [
+const patientEntries = [
   {
       "id": "d2773336-f723-11e9-8f0b-362b9e155667",
       "name": "John McClane",
@@ -13,7 +11,7 @@ const patientEntries: Patient[] = [
       "id": "d2773598-f723-11e9-8f0b-362b9e155667",
       "name": "Martin Riggs",
       "dateOfBirth": "1979-01-30",
-      "ssn": "300179-77A",
+      "ssn": "300179-177A",
       "gender": "male",
       "occupation": "Cop"
   },
